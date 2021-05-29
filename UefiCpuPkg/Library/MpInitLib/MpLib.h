@@ -240,9 +240,6 @@ struct _CPU_MP_DATA {
   UINTN                          CpuApStackSize;
   MP_ASSEMBLY_ADDRESS_MAP        AddressMap;
   UINTN                          WakeupBuffer;
-  UINTN                          WakeupBufferHigh;
-  UINTN                          BackupBuffer;
-  UINTN                          BackupBufferSize;
 
   volatile UINT32                FinishedCount;
   UINT32                         RunningCount;

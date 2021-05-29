@@ -96,7 +96,7 @@ GetWakeupBuffer (
   if (PcdGetBool (PcdSevEsIsEnabled)) {
     MemoryType = EfiReservedMemoryType;
   } else {
-    MemoryType = EfiBootServicesData;
+    MemoryType = EfiBootServicesCode;
   }
 
   //
