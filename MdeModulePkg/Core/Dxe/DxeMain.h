@@ -366,7 +366,7 @@ CoreAcquireGcdMemoryLock (
 **/
 EFI_STATUS
 CoreInitializeMemoryServices (
-  IN  VOID                  **HobStart,
+  IN  VOID                  *HobStart,
   OUT EFI_PHYSICAL_ADDRESS  *MemoryBaseAddress,
   OUT UINT64                *MemoryLength
   );

@@ -263,7 +263,7 @@ DxeMain (
   //
   // Initialize Memory Services
   //
-  CoreInitializeMemoryServices (&HobStart, &MemoryBaseAddress, &MemoryLength);
+  CoreInitializeMemoryServices (HobStart, &MemoryBaseAddress, &MemoryLength);
 
   MemoryProfileInit (HobStart);
 

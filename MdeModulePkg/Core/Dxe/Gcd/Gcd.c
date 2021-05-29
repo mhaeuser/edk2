@@ -2168,7 +2168,7 @@ FindLargestFreeRegion (
 **/
 EFI_STATUS
 CoreInitializeMemoryServices (
-  IN  VOID                  **HobStart,
+  IN  VOID                  *HobStart,
   OUT EFI_PHYSICAL_ADDRESS  *MemoryBaseAddress,
   OUT UINT64                *MemoryLength
   )
@@ -2194,7 +2194,7 @@ CoreInitializeMemoryServices (
   //
   // Point at the first HOB.  This must be the PHIT HOB.
   //
-  Hob.Raw = *HobStart;
+  Hob.Raw = HobStart;
   ASSERT (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_HANDOFF);
 
   //
@@ -2248,7 +2248,7 @@ CoreInitializeMemoryServices (
   // Find the Resource Descriptor HOB that contains PHIT range EfiFreeMemoryBottom..EfiFreeMemoryTop
   //
   Found  = FALSE;
-  for (Hob.Raw = *HobStart; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
+  for (Hob.Raw = HobStart; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
     //
     // Skip all HOBs except Resource Descriptor HOBs
     //
@@ -2304,7 +2304,7 @@ CoreInitializeMemoryServices (
         // Compute range between the start of the Resource Descriptor HOB and the start of the HOB List
         //
         BaseAddress = PageAlignAddress (ResourceHob->PhysicalStart);
-        Length      = PageAlignLength  ((UINT64)((UINTN)*HobStart - BaseAddress));
+        Length      = PageAlignLength  ((UINT64)((UINTN)HobStart - BaseAddress));
         FindLargestFreeRegion (&BaseAddress, &Length, (EFI_HOB_MEMORY_ALLOCATION *)GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION));
       }
     }
@@ -2329,7 +2329,7 @@ CoreInitializeMemoryServices (
     // The max address must be within the physically addressible range for the processor.
     //
     HighAddress = MAX_ALLOC_ADDRESS;
-    for (Hob.Raw = *HobStart; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
+    for (Hob.Raw = HobStart; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
       //
       // Skip the Resource Descriptor HOB that contains the PHIT
       //
