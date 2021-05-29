@@ -1424,7 +1424,7 @@ CoreAddMemorySpace (
                EFI_PAGE_SHIFT,
                PageLength,
                &PageBaseAddress,
-               gDxeCoreImageHandle,
+               gImageHandle,
                NULL
                );
 
@@ -1443,7 +1443,7 @@ CoreAddMemorySpace (
                    EFI_PAGE_SHIFT,
                    EFI_PAGE_SIZE,
                    &PageBaseAddress,
-                   gDxeCoreImageHandle,
+                   gImageHandle,
                    NULL
                    );
 
@@ -2590,7 +2590,7 @@ CoreInitializeGcdServices (
                0,
                MemoryLength,
                &MemoryBaseAddress,
-               gDxeCoreImageHandle,
+               gImageHandle,
                NULL
                );
   }
@@ -2611,7 +2611,7 @@ CoreInitializeGcdServices (
                    0,
                    MemoryHob->AllocDescriptor.MemoryLength,
                    &BaseAddress,
-                   gDxeCoreImageHandle,
+                   gImageHandle,
                    NULL
                    );
         if (!EFI_ERROR (Status) &&
@@ -2636,7 +2636,7 @@ CoreInitializeGcdServices (
                  0,
                  FirmwareVolumeHob->Length,
                  &BaseAddress,
-                 gDxeCoreImageHandle,
+                 gImageHandle,
                  NULL
                  );
     }
@@ -2680,7 +2680,7 @@ CoreInitializeGcdServices (
                    0,
                    Length,
                    &BaseAddress,
-                   gDxeCoreImageHandle,
+                   gImageHandle,
                    NULL
                    );
       }
@@ -2722,7 +2722,7 @@ CoreInitializeGcdServices (
                0,
                Length,
                &BaseAddress,
-               gDxeCoreImageHandle,
+               gImageHandle,
                NULL
                );
   }

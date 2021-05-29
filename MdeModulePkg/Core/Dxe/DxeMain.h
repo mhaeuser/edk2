@@ -258,10 +258,10 @@ typedef struct {
 //
 // DXE Core Global Variables
 //
-extern EFI_SYSTEM_TABLE                         *gDxeCoreST;
-extern EFI_RUNTIME_SERVICES                     *gDxeCoreRT;
-extern EFI_DXE_SERVICES                         *gDxeCoreDS;
-extern EFI_HANDLE                               gDxeCoreImageHandle;
+extern EFI_SYSTEM_TABLE                         *gST;
+extern EFI_RUNTIME_SERVICES                     *gRT;
+extern EFI_DXE_SERVICES                         *gDS;
+extern EFI_HANDLE                               gImageHandle;
 
 extern BOOLEAN                                  gMemoryMapTerminated;
 
