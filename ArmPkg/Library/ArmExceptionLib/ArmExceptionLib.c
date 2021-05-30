@@ -130,6 +130,15 @@ InitializeCpuExceptionHandlers(
   return RETURN_SUCCESS;
 }
 
+EFI_STATUS
+EFIAPI
+InitializeCpuExceptionHandlersPostMem (
+  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
+  )
+{
+  return EFI_SUCCESS;
+}
+
 /**
 Copies exception handlers to the specified address.
 
@@ -346,5 +355,15 @@ InitializeCpuExceptionHandlersEx (
   )
 {
   return InitializeCpuExceptionHandlers (VectorInfo);
+}
+
+EFI_STATUS
+EFIAPI
+InitializeCpuExceptionHandlersExPostMem (
+  IN EFI_VECTOR_HANDOFF_INFO            *VectorInfo OPTIONAL,
+  IN CPU_EXCEPTION_INIT_DATA            *InitData OPTIONAL
+  )
+{
+  return InitializeCpuExceptionHandlersPostMem (VectorInfo);
 }
 

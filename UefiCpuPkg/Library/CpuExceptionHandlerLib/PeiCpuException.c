@@ -12,9 +12,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
+#include <Library/PeiServicesLib.h>
 
 CONST UINTN    mDoFarReturnFlag  = 0;
 
+// FIXME: Data vs Code
 typedef struct {
   UINT8                   ExceptionStubHeader[HOOKAFTER_STUB_SIZE];
   EXCEPTION_HANDLER_DATA  *ExceptionHandlerData;
@@ -99,6 +101,15 @@ CommonExceptionHandler (
   CommonExceptionHandlerWorker (ExceptionType, SystemContext, ExceptionHandlerData);
 }
 
+EFI_STATUS
+EFIAPI
+InitializeCpuExceptionHandlers (
+  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
+  )
+{
+  return EFI_SUCCESS;
+}
+
 /**
   Initializes all CPU exceptions entries and provides the default exception handlers.
 
@@ -119,27 +130,44 @@ CommonExceptionHandler (
 **/
 EFI_STATUS
 EFIAPI
-InitializeCpuExceptionHandlers (
+InitializeCpuExceptionHandlersPostMem (
   IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
   )
 {
   EFI_STATUS                       Status;
   EXCEPTION_HANDLER_DATA           *ExceptionHandlerData;
-  RESERVED_VECTORS_DATA            *ReservedVectors;
+  RESERVED_VECTORS_DATA            *ReservedVectorsData;
+  EFI_PHYSICAL_ADDRESS             ReservedVectorsCodeAddress;
+  RESERVED_VECTORS_CODE            *ReservedVectorsCode;
 
-  ReservedVectors = AllocatePool (sizeof (RESERVED_VECTORS_DATA) * CPU_EXCEPTION_NUM);
-  ASSERT (ReservedVectors != NULL);
+  ReservedVectorsData = AllocatePool (sizeof (RESERVED_VECTORS_DATA) * CPU_EXCEPTION_NUM);
+  ASSERT (ReservedVectorsData != NULL);
 
   ExceptionHandlerData = AllocatePool (sizeof (EXCEPTION_HANDLER_DATA));
   ASSERT (ExceptionHandlerData != NULL);
-  ExceptionHandlerData->ReservedVectors          = ReservedVectors;
+
+  Status = PeiServicesAllocatePages (
+             EfiBootServicesCode,
+             EFI_SIZE_TO_PAGES (sizeof (RESERVED_VECTORS_CODE) * CPU_EXCEPTION_NUM),
+             &ReservedVectorsCodeAddress
+             );
+  if (EFI_ERROR (Status)) {
+    FreePool (ExceptionHandlerData);
+    FreePool (ReservedVectorsData);
+    return Status;
+  }
+  ReservedVectorsCode = (RESERVED_VECTORS_CODE *)(UINTN)ReservedVectorsCodeAddress;
+
+  ExceptionHandlerData->ReservedVectorsData      = ReservedVectorsData;
+  ExceptionHandlerData->ReservedVectorsCode      = ReservedVectorsCode;
   ExceptionHandlerData->ExternalInterruptHandler = NULL;
   InitializeSpinLock (&ExceptionHandlerData->DisplayMessageSpinLock);
 
   Status = InitializeCpuExceptionHandlersWorker (VectorInfo, ExceptionHandlerData);
   if (EFI_ERROR (Status)) {
-    FreePool (ReservedVectors);
+    PeiServicesFreePages (ReservedVectorsCodeAddress, EFI_SIZE_TO_PAGES (sizeof (RESERVED_VECTORS_CODE) * CPU_EXCEPTION_NUM));
     FreePool (ExceptionHandlerData);
+    FreePool (ReservedVectorsData);
     return Status;
   }
 
@@ -234,6 +262,16 @@ InitializeCpuExceptionHandlersEx (
   IN CPU_EXCEPTION_INIT_DATA            *InitData OPTIONAL
   )
 {
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+EFIAPI
+InitializeCpuExceptionHandlersExPostMem (
+  IN EFI_VECTOR_HANDOFF_INFO            *VectorInfo OPTIONAL,
+  IN CPU_EXCEPTION_INIT_DATA            *InitData OPTIONAL
+  )
+{
   EFI_STATUS                        Status;
 
   //
@@ -244,7 +282,7 @@ InitializeCpuExceptionHandlersEx (
   // non-ex version of it, if this version has to be called.
   //
   if (InitData == NULL || InitData->Ia32.InitDefaultHandlers) {
-    Status = InitializeCpuExceptionHandlers (VectorInfo);
+    Status = InitializeCpuExceptionHandlersPostMem (VectorInfo);
   } else {
     Status = EFI_SUCCESS;
   }

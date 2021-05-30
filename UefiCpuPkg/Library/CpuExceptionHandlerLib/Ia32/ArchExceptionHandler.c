@@ -56,18 +56,20 @@ ArchSaveExceptionContext (
   )
 {
   IA32_EFLAGS32           Eflags;
-  RESERVED_VECTORS_DATA   *ReservedVectors;
+  RESERVED_VECTORS_DATA   *ReservedVectorsData;
+  RESERVED_VECTORS_CODE   *ReservedVectorsCode;
 
-  ReservedVectors = ExceptionHandlerData->ReservedVectors;
+  ReservedVectorsData = ExceptionHandlerData->ReservedVectorsData;
+  ReservedVectorsCode = ExceptionHandlerData->ReservedVectorsCode;
   //
   // Save Exception context in global variable in first entry of the exception handler.
   // So when original exception handler returns to the new exception handler (second entry),
   // the Eflags/Cs/Eip/ExceptionData can be used.
   //
-  ReservedVectors[ExceptionType].OldFlags      = SystemContext.SystemContextIa32->Eflags;
-  ReservedVectors[ExceptionType].OldCs         = SystemContext.SystemContextIa32->Cs;
-  ReservedVectors[ExceptionType].OldIp         = SystemContext.SystemContextIa32->Eip;
-  ReservedVectors[ExceptionType].ExceptionData = SystemContext.SystemContextIa32->ExceptionData;
+  ReservedVectorsData[ExceptionType].OldFlags      = SystemContext.SystemContextIa32->Eflags;
+  ReservedVectorsData[ExceptionType].OldCs         = SystemContext.SystemContextIa32->Cs;
+  ReservedVectorsData[ExceptionType].OldIp         = SystemContext.SystemContextIa32->Eip;
+  ReservedVectorsData[ExceptionType].ExceptionData = SystemContext.SystemContextIa32->ExceptionData;
   //
   // Clear IF flag to avoid old IDT handler enable interrupt by IRET
   //
@@ -77,7 +79,7 @@ ArchSaveExceptionContext (
   //
   // Modify the EIP in stack, then old IDT handler will return to HookAfterStubBegin.
   //
-  SystemContext.SystemContextIa32->Eip    = (UINTN) ReservedVectors[ExceptionType].HookAfterStubHeaderCode;
+  SystemContext.SystemContextIa32->Eip    = (UINTN) ReservedVectorsCode[ExceptionType].HookAfterStubHeaderCode;
 }
 
 /**
@@ -94,13 +96,13 @@ ArchRestoreExceptionContext (
   IN EXCEPTION_HANDLER_DATA       *ExceptionHandlerData
   )
 {
-  RESERVED_VECTORS_DATA   *ReservedVectors;
+  RESERVED_VECTORS_DATA   *ReservedVectorsData;
 
-  ReservedVectors = ExceptionHandlerData->ReservedVectors;
-  SystemContext.SystemContextIa32->Eflags        = ReservedVectors[ExceptionType].OldFlags;
-  SystemContext.SystemContextIa32->Cs            = ReservedVectors[ExceptionType].OldCs;
-  SystemContext.SystemContextIa32->Eip           = ReservedVectors[ExceptionType].OldIp;
-  SystemContext.SystemContextIa32->ExceptionData = ReservedVectors[ExceptionType].ExceptionData;
+  ReservedVectorsData = ExceptionHandlerData->ReservedVectorsData;
+  SystemContext.SystemContextIa32->Eflags        = ReservedVectorsData[ExceptionType].OldFlags;
+  SystemContext.SystemContextIa32->Cs            = ReservedVectorsData[ExceptionType].OldCs;
+  SystemContext.SystemContextIa32->Eip           = ReservedVectorsData[ExceptionType].OldIp;
+  SystemContext.SystemContextIa32->ExceptionData = ReservedVectorsData[ExceptionType].ExceptionData;
 }
 
 /**

@@ -24,10 +24,7 @@ extern ASM_PFX(mErrorCodeFlag)    ; Error code flags for exceptions
 extern ASM_PFX(mDoFarReturnFlag)  ; Do far return flag
 extern ASM_PFX(CommonExceptionHandler)
 
-SECTION .data
-
-DEFAULT REL
-SECTION .text
+SECTION .rdata
 
 ALIGN   8
 
@@ -48,6 +45,12 @@ HookAfterStubHeaderBegin:
     push    rax
     mov     rax, HookAfterStubHeaderEnd
     jmp     rax
+
+DEFAULT REL
+SECTION .text
+
+ALIGN   8
+
 HookAfterStubHeaderEnd:
     mov     rax, rsp
     and     sp,  0xfff0        ; make sure 16-byte aligned for exception context

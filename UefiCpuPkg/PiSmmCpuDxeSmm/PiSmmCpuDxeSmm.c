@@ -170,6 +170,8 @@ InitializeSmmIdt (
   //
   Status = InitializeCpuExceptionHandlers (NULL);
   ASSERT_EFI_ERROR (Status);
+  Status = InitializeCpuExceptionHandlersPostMem (NULL);
+  ASSERT_EFI_ERROR (Status);
   //
   // Restore DXE IDT table and CPU interrupt
   //

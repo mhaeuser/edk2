@@ -8,6 +8,7 @@
 
 #include <PiSmm.h>
 #include "CpuExceptionCommon.h"
+#include <Library/SmmServicesTableLib.h>
 
 CONST UINTN   mDoFarReturnFlag   = 1;
 
@@ -57,10 +58,40 @@ InitializeCpuExceptionHandlers (
   IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
   )
 {
-  mExceptionHandlerData.ReservedVectors          = mReservedVectorsData;
+  //
+  // SMM does currently not install IDT early, so no need to implement.
+  //
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+EFIAPI
+InitializeCpuExceptionHandlersPostMem (
+  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
+  )
+{
+  EFI_STATUS            Status;
+  RESERVED_VECTORS_CODE *ReservedVectorsCode;
+
+  Status = gSmst->SmmAllocatePool (
+                    EfiRuntimeServicesCode,
+                    sizeof (RESERVED_VECTORS_CODE) * CPU_EXCEPTION_NUM,
+                    (VOID **) &ReservedVectorsCode
+                    );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  mExceptionHandlerData.ReservedVectorsData      = mReservedVectorsData;
+  mExceptionHandlerData.ReservedVectorsCode      = ReservedVectorsCode;
   mExceptionHandlerData.ExternalInterruptHandler = mExternalInterruptHandlerTable;
   InitializeSpinLock (&mExceptionHandlerData.DisplayMessageSpinLock);
-  return InitializeCpuExceptionHandlersWorker (VectorInfo, &mExceptionHandlerData);
+  Status = InitializeCpuExceptionHandlersWorker (VectorInfo, &mExceptionHandlerData);
+  if (EFI_ERROR (Status)) {
+    gSmst->SmmFreePool (ReservedVectorsCode);
+  }
+
+  return Status;
 }
 
 /**
@@ -151,4 +182,14 @@ InitializeCpuExceptionHandlersEx (
   )
 {
   return InitializeCpuExceptionHandlers (VectorInfo);
+}
+
+EFI_STATUS
+EFIAPI
+InitializeCpuExceptionHandlersExPostMem (
+  IN EFI_VECTOR_HANDOFF_INFO            *VectorInfo OPTIONAL,
+  IN CPU_EXCEPTION_INIT_DATA            *InitData OPTIONAL
+  )
+{
+  return InitializeCpuExceptionHandlersPostMem (VectorInfo);
 }

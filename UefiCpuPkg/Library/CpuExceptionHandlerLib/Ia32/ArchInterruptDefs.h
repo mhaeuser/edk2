@@ -32,8 +32,11 @@ typedef struct {
   UINTN       OldCs;
   UINTN       OldIp;
   UINTN       ExceptionData;
-  UINT8       HookAfterStubHeaderCode[HOOKAFTER_STUB_SIZE];
 } RESERVED_VECTORS_DATA;
+
+typedef struct {
+  UINT8       HookAfterStubHeaderCode[HOOKAFTER_STUB_SIZE];
+} RESERVED_VECTORS_CODE;
 
 #define CPU_TSS_DESC_SIZE \
   (sizeof (IA32_TSS_DESCRIPTOR) * \

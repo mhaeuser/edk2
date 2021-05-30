@@ -267,6 +267,9 @@ DxeMain (
 
   MemoryProfileInit (HobStart);
 
+  Status = InitializeCpuExceptionHandlersExPostMem (VectorInfoList, NULL);
+  ASSERT_EFI_ERROR (Status);
+
   //
   // Allocate the EFI System Table and EFI Runtime Service Table from EfiRuntimeServicesData
   // Use the templates to initialize the contents of the EFI System Table and EFI Runtime Services Table

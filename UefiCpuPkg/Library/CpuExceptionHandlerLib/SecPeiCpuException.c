@@ -137,6 +137,15 @@ InitializeCpuExceptionHandlers (
   return EFI_SUCCESS;
 }
 
+EFI_STATUS
+EFIAPI
+InitializeCpuExceptionHandlersPostMem (
+  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
+  )
+{
+  return EFI_SUCCESS;
+}
+
 /**
   Initializes all CPU interrupt/exceptions entries and provides the default interrupt/exception handlers.
 
@@ -225,4 +234,14 @@ InitializeCpuExceptionHandlersEx (
   )
 {
   return InitializeCpuExceptionHandlers (VectorInfo);
+}
+
+EFI_STATUS
+EFIAPI
+InitializeCpuExceptionHandlersExPostMem (
+  IN EFI_VECTOR_HANDOFF_INFO            *VectorInfo OPTIONAL,
+  IN CPU_EXCEPTION_INIT_DATA            *InitData OPTIONAL
+  )
+{
+  return InitializeCpuExceptionHandlersPostMem (VectorInfo);
 }

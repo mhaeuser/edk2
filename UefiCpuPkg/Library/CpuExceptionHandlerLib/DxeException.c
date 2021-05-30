@@ -11,9 +11,14 @@
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/DxeServicesTableLib.h>
 
 CONST UINTN    mDoFarReturnFlag  = 0;
 
+//
+// This is only used till the memory services are available.
+//
+RESERVED_VECTORS_CODE       mReservedVectorsCode[CPU_EXCEPTION_NUM];
 RESERVED_VECTORS_DATA       mReservedVectorsData[CPU_EXCEPTION_NUM];
 EFI_CPU_INTERRUPT_HANDLER   mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];
 UINTN                       mEnabledInterruptNum = 0;
@@ -62,10 +67,52 @@ InitializeCpuExceptionHandlers (
   IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
   )
 {
-  mExceptionHandlerData.ReservedVectors          = mReservedVectorsData;
+  mExceptionHandlerData.ReservedVectorsData      = mReservedVectorsData;
+  mExceptionHandlerData.ReservedVectorsCode      = mReservedVectorsCode;
   mExceptionHandlerData.ExternalInterruptHandler = mExternalInterruptHandlerTable;
   InitializeSpinLock (&mExceptionHandlerData.DisplayMessageSpinLock);
   return InitializeCpuExceptionHandlersWorker (VectorInfo, &mExceptionHandlerData);
+}
+
+EFI_STATUS
+EFIAPI
+InitializeCpuExceptionHandlersPostMem (
+  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
+  )
+{
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  ReservedVectorsCodeAddress;
+  RESERVED_VECTORS_CODE *ReservedVectorsCode;
+
+  Status = gBS->AllocatePages (
+                  AllocateAnyPages,
+                  EfiBootServicesCode,
+                  EFI_SIZE_TO_PAGES (sizeof (RESERVED_VECTORS_CODE) * CPU_EXCEPTION_NUM),
+                  &ReservedVectorsCodeAddress
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  ReservedVectorsCode = (RESERVED_VECTORS_CODE *) (UINTN) ReservedVectorsCodeAddress;
+
+  CopyMem (
+    ReservedVectorsCode,
+    mReservedVectorsCode,
+    sizeof (RESERVED_VECTORS_CODE) * CPU_EXCEPTION_NUM
+    );
+  Status = gDS->SetMemorySpaceAttributes (
+                  ReservedVectorsCodeAddress,
+                  sizeof (RESERVED_VECTORS_CODE) * CPU_EXCEPTION_NUM,
+                  EFI_MEMORY_RO
+                  );
+  mExceptionHandlerData.ReservedVectorsCode = ReservedVectorsCode;
+  // FIXME: SecureZeroMem
+  ZeroMem (
+    mReservedVectorsCode,
+    sizeof (mReservedVectorsCode)
+    );
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -96,22 +143,46 @@ InitializeCpuInterruptHandlers (
   UINTN                              IdtEntryCount;
   EXCEPTION_HANDLER_TEMPLATE_MAP     TemplateMap;
   UINTN                              Index;
-  UINTN                              InterruptEntry;
+  EFI_PHYSICAL_ADDRESS               InterruptEntryCodeAddress;
   UINT8                              *InterruptEntryCode;
-  RESERVED_VECTORS_DATA              *ReservedVectors;
+  RESERVED_VECTORS_DATA              *ReservedVectorsData;
+  EFI_PHYSICAL_ADDRESS               ReservedVectorsCodeAddress;
+  RESERVED_VECTORS_CODE              *ReservedVectorsCode;
   EFI_CPU_INTERRUPT_HANDLER          *ExternalInterruptHandler;
 
   Status = gBS->AllocatePool (
-                  EfiBootServicesCode,
+                  EfiBootServicesData,
                   sizeof (RESERVED_VECTORS_DATA) * CPU_INTERRUPT_NUM,
-                  (VOID **)&ReservedVectors
+                  (VOID **)&ReservedVectorsData
                   );
-  ASSERT (!EFI_ERROR (Status) && ReservedVectors != NULL);
-  SetMem ((VOID *) ReservedVectors, sizeof (RESERVED_VECTORS_DATA) * CPU_INTERRUPT_NUM, 0xff);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+
+  Status = gBS->AllocatePages (
+                  AllocateAnyPages,
+                  EfiBootServicesCode,
+                  EFI_SIZE_TO_PAGES (sizeof (RESERVED_VECTORS_CODE) * CPU_INTERRUPT_NUM),
+                  &ReservedVectorsCodeAddress
+                  );
+  if (EFI_ERROR (Status)) {
+    gBS->FreePool (ReservedVectorsData);
+    return Status;
+  }
+  ReservedVectorsCode = (RESERVED_VECTORS_CODE *)(UINTN)ReservedVectorsCodeAddress;
+
+  SetMem ((VOID *) ReservedVectorsData, sizeof (RESERVED_VECTORS_DATA) * CPU_INTERRUPT_NUM, 0xff);
+  SetMem ((VOID *) ReservedVectorsCode, sizeof (RESERVED_VECTORS_CODE) * CPU_INTERRUPT_NUM, 0xff);
   if (VectorInfo != NULL) {
-    Status = ReadAndVerifyVectorInfo (VectorInfo, ReservedVectors, CPU_INTERRUPT_NUM);
+    Status = ReadAndVerifyVectorInfo (
+               VectorInfo,
+               mExceptionHandlerData.ReservedVectorsData,
+               CPU_INTERRUPT_NUM
+               );
     if (EFI_ERROR (Status)) {
-      FreePool (ReservedVectors);
+      gBS->FreePages (ReservedVectorsCodeAddress, EFI_SIZE_TO_PAGES (sizeof (RESERVED_VECTORS_CODE) * CPU_INTERRUPT_NUM));
+      gBS->FreePool (ReservedVectorsData);
       return EFI_INVALID_PARAMETER;
     }
   }
@@ -137,31 +208,53 @@ InitializeCpuInterruptHandlers (
   AsmGetTemplateAddressMap (&TemplateMap);
   ASSERT (TemplateMap.ExceptionStubHeaderSize <= HOOKAFTER_STUB_SIZE);
 
-  Status = gBS->AllocatePool (
+  // FIXME: Merge with alloc above
+  Status = gBS->AllocatePages (
+                  AllocateAnyPages,
                   EfiBootServicesCode,
-                  TemplateMap.ExceptionStubHeaderSize * CPU_INTERRUPT_NUM,
-                  (VOID **)&InterruptEntryCode
+                  EFI_SIZE_TO_PAGES (TemplateMap.ExceptionStubHeaderSize * CPU_INTERRUPT_NUM),
+                  &InterruptEntryCodeAddress
                   );
-  ASSERT (!EFI_ERROR (Status) && InterruptEntryCode != NULL);
+  if (EFI_ERROR (Status)) {
+    FreePool (IdtTable);
+    gBS->FreePages (ReservedVectorsCodeAddress, EFI_SIZE_TO_PAGES (sizeof (RESERVED_VECTORS_CODE) * CPU_INTERRUPT_NUM));
+    gBS->FreePool (ReservedVectorsData);
+    return Status;
+  }
 
-  InterruptEntry = (UINTN) InterruptEntryCode;
+  InterruptEntryCode = (UINT8 *) (UINTN) InterruptEntryCodeAddress;
   for (Index = 0; Index < CPU_INTERRUPT_NUM; Index ++) {
     CopyMem (
-      (VOID *) InterruptEntry,
+      (VOID *) InterruptEntryCodeAddress,
       (VOID *) TemplateMap.ExceptionStart,
       TemplateMap.ExceptionStubHeaderSize
       );
-    AsmVectorNumFixup ((VOID *) InterruptEntry,  (UINT8) Index, (VOID *) TemplateMap.ExceptionStart);
-    InterruptEntry += TemplateMap.ExceptionStubHeaderSize;
+    AsmVectorNumFixup ((VOID *) (UINTN) InterruptEntryCodeAddress,  (UINT8) Index, (VOID *) TemplateMap.ExceptionStart);
+    InterruptEntryCodeAddress += TemplateMap.ExceptionStubHeaderSize;
   }
 
   TemplateMap.ExceptionStart = (UINTN) InterruptEntryCode;
   mExceptionHandlerData.IdtEntryCount            = CPU_INTERRUPT_NUM;
-  mExceptionHandlerData.ReservedVectors          = ReservedVectors;
+  mExceptionHandlerData.ReservedVectorsData      = ReservedVectorsData;
+  mExceptionHandlerData.ReservedVectorsCode      = ReservedVectorsCode;
   mExceptionHandlerData.ExternalInterruptHandler = ExternalInterruptHandler;
   InitializeSpinLock (&mExceptionHandlerData.DisplayMessageSpinLock);
 
   UpdateIdtTable (IdtTable, &TemplateMap, &mExceptionHandlerData);
+
+  Status = gDS->SetMemorySpaceAttributes (
+                  InterruptEntryCodeAddress,
+                  TemplateMap.ExceptionStubHeaderSize * CPU_INTERRUPT_NUM,
+                  EFI_MEMORY_RO
+                  );
+  //ASSERT_EFI_ERROR (Status);
+
+  Status = gDS->SetMemorySpaceAttributes (
+                  ReservedVectorsCodeAddress,
+                  sizeof (RESERVED_VECTORS_CODE) * CPU_INTERRUPT_NUM,
+                  EFI_MEMORY_RO
+                  );
+  //ASSERT_EFI_ERROR (Status);
 
   //
   // Load Interrupt Descriptor Table
@@ -284,4 +377,14 @@ InitializeCpuExceptionHandlersEx (
   }
 
   return  Status;
+}
+
+EFI_STATUS
+EFIAPI
+InitializeCpuExceptionHandlersExPostMem (
+  IN EFI_VECTOR_HANDOFF_INFO            *VectorInfo OPTIONAL,
+  IN CPU_EXCEPTION_INIT_DATA            *InitData OPTIONAL
+  )
+{
+  return InitializeCpuExceptionHandlersPostMem (VectorInfo);
 }

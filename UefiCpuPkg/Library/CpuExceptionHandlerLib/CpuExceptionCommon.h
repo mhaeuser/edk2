@@ -61,7 +61,8 @@ typedef struct {
 typedef struct {
   UINTN                       IdtEntryCount;
   SPIN_LOCK                   DisplayMessageSpinLock;
-  RESERVED_VECTORS_DATA       *ReservedVectors;
+  RESERVED_VECTORS_DATA       *ReservedVectorsData;
+  RESERVED_VECTORS_CODE       *ReservedVectorsCode;
   EFI_CPU_INTERRUPT_HANDLER   *ExternalInterruptHandler;
 } EXCEPTION_HANDLER_DATA;
 

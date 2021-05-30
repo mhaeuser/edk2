@@ -458,6 +458,8 @@ InitializeExceptionStackSwitchHandlers (
   EssData->Ia32.IdtTableSize = Idtr.Limit + 1;
   Status = InitializeCpuExceptionHandlersEx (NULL, EssData);
   ASSERT_EFI_ERROR (Status);
+  Status = InitializeCpuExceptionHandlersExPostMem (NULL, EssData);
+  ASSERT_EFI_ERROR (Status);
 }
 
 /**
@@ -650,6 +652,11 @@ InitializeCpuMpWorker (
   // Initialize default handlers
   //
   Status = InitializeCpuExceptionHandlers (VectorInfo);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = InitializeCpuExceptionHandlersPostMem (VectorInfo);
   if (EFI_ERROR (Status)) {
     return Status;
   }

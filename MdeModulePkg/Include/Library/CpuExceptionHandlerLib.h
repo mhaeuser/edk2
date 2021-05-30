@@ -102,6 +102,12 @@ InitializeCpuExceptionHandlers (
   IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
   );
 
+EFI_STATUS
+EFIAPI
+InitializeCpuExceptionHandlersPostMem (
+  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
+  );
+
 /**
   Initializes all CPU exceptions entries with optional extra initializations.
 
@@ -128,6 +134,13 @@ InitializeCpuExceptionHandlers (
 EFI_STATUS
 EFIAPI
 InitializeCpuExceptionHandlersEx (
+  IN EFI_VECTOR_HANDOFF_INFO            *VectorInfo OPTIONAL,
+  IN CPU_EXCEPTION_INIT_DATA            *InitData OPTIONAL
+  );
+
+EFI_STATUS
+EFIAPI
+InitializeCpuExceptionHandlersExPostMem (
   IN EFI_VECTOR_HANDOFF_INFO            *VectorInfo OPTIONAL,
   IN CPU_EXCEPTION_INIT_DATA            *InitData OPTIONAL
   );

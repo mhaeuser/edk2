@@ -57,20 +57,22 @@ ArchSaveExceptionContext (
   )
 {
   IA32_EFLAGS32           Eflags;
-  RESERVED_VECTORS_DATA   *ReservedVectors;
+  RESERVED_VECTORS_DATA   *ReservedVectorsData;
+  RESERVED_VECTORS_CODE   *ReservedVectorsCode;
 
-  ReservedVectors = ExceptionHandlerData->ReservedVectors;
+  ReservedVectorsData = ExceptionHandlerData->ReservedVectorsData;
+  ReservedVectorsCode = ExceptionHandlerData->ReservedVectorsCode;
   //
   // Save Exception context in global variable in first entry of the exception handler.
   // So when original exception handler returns to the new exception handler (second entry),
   // the Eflags/Cs/Eip/ExceptionData can be used.
   //
-  ReservedVectors[ExceptionType].OldSs         = SystemContext.SystemContextX64->Ss;
-  ReservedVectors[ExceptionType].OldSp         = SystemContext.SystemContextX64->Rsp;
-  ReservedVectors[ExceptionType].OldFlags      = SystemContext.SystemContextX64->Rflags;
-  ReservedVectors[ExceptionType].OldCs         = SystemContext.SystemContextX64->Cs;
-  ReservedVectors[ExceptionType].OldIp         = SystemContext.SystemContextX64->Rip;
-  ReservedVectors[ExceptionType].ExceptionData = SystemContext.SystemContextX64->ExceptionData;
+  ReservedVectorsData[ExceptionType].OldSs         = SystemContext.SystemContextX64->Ss;
+  ReservedVectorsData[ExceptionType].OldSp         = SystemContext.SystemContextX64->Rsp;
+  ReservedVectorsData[ExceptionType].OldFlags      = SystemContext.SystemContextX64->Rflags;
+  ReservedVectorsData[ExceptionType].OldCs         = SystemContext.SystemContextX64->Cs;
+  ReservedVectorsData[ExceptionType].OldIp         = SystemContext.SystemContextX64->Rip;
+  ReservedVectorsData[ExceptionType].ExceptionData = SystemContext.SystemContextX64->ExceptionData;
   //
   // Clear IF flag to avoid old IDT handler enable interrupt by IRET
   //
@@ -80,7 +82,7 @@ ArchSaveExceptionContext (
   //
   // Modify the EIP in stack, then old IDT handler will return to HookAfterStubBegin.
   //
-  SystemContext.SystemContextX64->Rip = (UINTN) ReservedVectors[ExceptionType].HookAfterStubHeaderCode;
+  SystemContext.SystemContextX64->Rip = (UINTN) ReservedVectorsCode[ExceptionType].HookAfterStubHeaderCode;
 }
 
 /**
@@ -97,15 +99,15 @@ ArchRestoreExceptionContext (
   IN EXCEPTION_HANDLER_DATA       *ExceptionHandlerData
   )
 {
-  RESERVED_VECTORS_DATA   *ReservedVectors;
+  RESERVED_VECTORS_DATA   *ReservedVectorsData;
 
-  ReservedVectors = ExceptionHandlerData->ReservedVectors;
-  SystemContext.SystemContextX64->Ss            = ReservedVectors[ExceptionType].OldSs;
-  SystemContext.SystemContextX64->Rsp           = ReservedVectors[ExceptionType].OldSp;
-  SystemContext.SystemContextX64->Rflags        = ReservedVectors[ExceptionType].OldFlags;
-  SystemContext.SystemContextX64->Cs            = ReservedVectors[ExceptionType].OldCs;
-  SystemContext.SystemContextX64->Rip           = ReservedVectors[ExceptionType].OldIp;
-  SystemContext.SystemContextX64->ExceptionData = ReservedVectors[ExceptionType].ExceptionData;
+  ReservedVectorsData = ExceptionHandlerData->ReservedVectorsData;
+  SystemContext.SystemContextX64->Ss            = ReservedVectorsData[ExceptionType].OldSs;
+  SystemContext.SystemContextX64->Rsp           = ReservedVectorsData[ExceptionType].OldSp;
+  SystemContext.SystemContextX64->Rflags        = ReservedVectorsData[ExceptionType].OldFlags;
+  SystemContext.SystemContextX64->Cs            = ReservedVectorsData[ExceptionType].OldCs;
+  SystemContext.SystemContextX64->Rip           = ReservedVectorsData[ExceptionType].OldIp;
+  SystemContext.SystemContextX64->ExceptionData = ReservedVectorsData[ExceptionType].ExceptionData;
 }
 
 /**
