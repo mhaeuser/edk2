@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef _CPU_DXE_H_
-#define _CPU_DXE_H_
+#ifndef _CPU_ARCH_LIB_H_
+#define _CPU_ARCH_LIB_H_
 
 #include <PiDxe.h>
 
@@ -33,7 +33,8 @@
 #include <Library/CpuExceptionHandlerLib.h>
 #include <Library/HobLib.h>
 #include <Library/ReportStatusCodeLib.h>
-#include <Library/MpInitLib.h>
+// FIXME:
+//#include <Library/MpInitLib.h>
 #include <Library/TimerLib.h>
 
 #include <Guid/IdleLoopEvent.h>

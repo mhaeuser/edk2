@@ -9,14 +9,9 @@
 #ifndef _CPU_MP_H_
 #define _CPU_MP_H_
 
-/**
-  Initialize Multi-processor support.
+#include <PiDxe.h>
 
-**/
-VOID
-InitializeMpSupport (
-  VOID
-  );
+#include <Protocol/MpService.h>
 
 /**
   This service retrieves the number of logical processor in the platform

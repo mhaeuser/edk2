@@ -12,10 +12,10 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = CpuDxe
   MODULE_UNI_FILE                = CpuDxe.uni
-  FILE_GUID                      = 1A1E4886-9517-440e-9FDE-3BE44CEE2136
+  FILE_GUID                      = 62F6C4B3-19B5-4486-82F7-2252760927AA
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  ENTRY_POINT                    = InitializeCpu
+  ENTRY_POINT                    = InitializeMpSupport
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -43,41 +43,18 @@
   PeCoffGetEntryPointLib
 
 [Sources]
-  CpuDxe.c
-  CpuDxe.h
-  CpuGdt.c
-  CpuGdt.h
   CpuMp.c
   CpuMp.h
-  CpuPageTable.h
-  CpuPageTable.c
-
-[Sources.IA32]
-  Ia32/CpuAsm.nasm
-  Ia32/PagingAttribute.c
-
-[Sources.X64]
-  X64/CpuAsm.nasm
-  X64/PagingAttribute.c
 
 [Protocols]
-  gEfiCpuArchProtocolGuid                       ## PRODUCES
   gEfiMpServiceProtocolGuid                     ## PRODUCES
-  gEfiSmmBase2ProtocolGuid                      ## SOMETIMES_CONSUMES
-
-[Guids]
-  gIdleLoopEventGuid                            ## CONSUMES           ## Event
-  gEfiVectorHandoffTableGuid                    ## SOMETIMES_CONSUMES ## SystemTable
 
 [Ppis]
   gEfiSecPlatformInformation2PpiGuid            ## UNDEFINED # HOB
   gEfiSecPlatformInformationPpiGuid             ## UNDEFINED # HOB
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                       ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask               ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuStackSwitchExceptionList              ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuKnownGoodStackSize                    ## CONSUMES
 

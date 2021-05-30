@@ -6,8 +6,7 @@
 
 **/
 
-#include "CpuDxe.h"
-#include "CpuMp.h"
+#include "CpuArchLib.h"
 #include "CpuPageTable.h"
 
 //
@@ -80,7 +79,8 @@ FIXED_MTRR    mFixedMtrrTable[] = {
 };
 
 
-EFI_CPU_ARCH_PROTOCOL  gCpu = {
+// FIXME: CpuDxe
+EFI_CPU_ARCH_PROTOCOL  gCpuImpl = {
   CpuFlushCpuDataCache,
   CpuEnableInterrupt,
   CpuDisableInterrupt,
@@ -1105,7 +1105,7 @@ FreeMemorySpaceMap:
 **/
 VOID
 AddLocalApicMemorySpace (
-  IN EFI_HANDLE               ImageHandle
+  VOID
   )
 {
   EFI_STATUS              Status;
@@ -1126,7 +1126,7 @@ AddLocalApicMemorySpace (
                   0,
                   SIZE_4KB,
                   &BaseAddress,
-                  ImageHandle,
+                  gImageHandle,
                   NULL
                   );
   if (EFI_ERROR (Status)) {
@@ -1147,10 +1147,8 @@ AddLocalApicMemorySpace (
 
 **/
 EFI_STATUS
-EFIAPI
 InitializeCpu (
-  IN EFI_HANDLE                            ImageHandle,
-  IN EFI_SYSTEM_TABLE                      *SystemTable
+  VOID
   )
 {
   EFI_STATUS  Status;
@@ -1180,7 +1178,7 @@ InitializeCpu (
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mCpuHandle,
-                  &gEfiCpuArchProtocolGuid, &gCpu,
+                  &gEfiCpuArchProtocolGuid, &gCpuImpl,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
@@ -1193,7 +1191,7 @@ InitializeCpu (
   //
   // Add and allocate local APIC memory mapped space
   //
-  AddLocalApicMemorySpace (ImageHandle);
+  AddLocalApicMemorySpace ();
 
   //
   // Setup a callback for idle events
@@ -1208,8 +1206,7 @@ InitializeCpu (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  InitializeMpSupport ();
-
-  return Status;
+  // FIXME: Need to dealloc resources on error
+  return EFI_SUCCESS;
 }
 

@@ -7,7 +7,7 @@
 
 **/
 
-#include "CpuDxe.h"
+#include "CpuArchLib.h"
 #include "CpuGdt.h"
 
 //

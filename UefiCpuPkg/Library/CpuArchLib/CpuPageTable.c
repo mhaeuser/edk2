@@ -18,7 +18,7 @@
 #include <Register/Intel/Cpuid.h>
 #include <Register/Intel/Msr.h>
 
-#include "CpuDxe.h"
+#include "CpuArchLib.h"
 #include "CpuPageTable.h"
 
 ///
@@ -1204,7 +1204,9 @@ DebugExceptionHandler (
   UINTN     PFEntry;
   BOOLEAN   IsWpEnabled;
 
-  MpInitLibWhoAmI (&CpuIndex);
+  // FIXME:
+  CpuIndex = 0;
+  //MpInitLibWhoAmI (&CpuIndex);
 
   //
   // Clear last PF entries
@@ -1279,7 +1281,9 @@ PageFaultExceptionHandler (
   }
 
   if (NonStopMode) {
-    MpInitLibWhoAmI (&CpuIndex);
+    // FIXME:
+    CpuIndex = 0;
+    //MpInitLibWhoAmI (&CpuIndex);
     GetCurrentPagingContext (&PagingContext);
     //
     // Memory operation cross page boundary, like "rep mov" instruction, will
@@ -1364,6 +1368,8 @@ InitializePageTableLib (
   }
 
   if (HEAP_GUARD_NONSTOP_MODE || NULL_DETECTION_NONSTOP_MODE) {
+    // FIXME: mNumberOfProcessors always 1 as MP is init after PageTable
+    UINTN mNumberOfProcessors = 1;
     mPFEntryCount = (UINTN *)AllocateZeroPool (sizeof (UINTN) * mNumberOfProcessors);
     ASSERT (mPFEntryCount != NULL);
 

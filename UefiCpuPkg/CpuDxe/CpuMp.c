@@ -810,9 +810,11 @@ InitializeMpExceptionHandlers (
   Initialize Multi-processor support.
 
 **/
-VOID
+EFI_STATUS
+EFIAPI
 InitializeMpSupport (
-  VOID
+  IN EFI_HANDLE                            ImageHandle,
+  IN EFI_SYSTEM_TABLE                      *SystemTable
   )
 {
   EFI_STATUS     Status;
@@ -845,5 +847,7 @@ InitializeMpSupport (
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
+
+  return Status;
 }
 

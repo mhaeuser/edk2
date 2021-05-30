@@ -104,6 +104,12 @@
   VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
   MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
 
+  UefiCpuLib|UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
+  LocalApicLib|UefiCpuPkg/Library/BaseXApicX2ApicLib/BaseXApicX2ApicLib.inf
+  MtrrLib|UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
+  CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
+  CpuArchLib|UefiCpuPkg/Library/CpuArchLib/CpuArchLib.inf
+
 [LibraryClasses.EBC.PEIM]
   IoLib|MdePkg/Library/PeiIoLibCpuIo/PeiIoLibCpuIo.inf
 
