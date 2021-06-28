@@ -848,6 +848,5 @@ DumpMmramInfo (
 
 extern UINTN                    mMmramRangeCount;
 extern EFI_MMRAM_DESCRIPTOR     *mMmramRanges;
-extern EFI_SYSTEM_TABLE         *mEfiSystemTable;
 
 #endif
