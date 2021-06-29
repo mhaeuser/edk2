@@ -380,7 +380,6 @@ BuildDriverInfo (
   EFI_STATUS                        Status;
   MEMORY_PROFILE_DRIVER_INFO        *DriverInfo;
   MEMORY_PROFILE_DRIVER_INFO_DATA   *DriverInfoData;
-  VOID                              *EntryPointInImage;
   CHAR8                             *PdbString;
   UINTN                             PdbSize;
   UINTN                             PdbOccupiedSize;
@@ -423,15 +422,6 @@ BuildDriverInfo (
   DriverInfo->ImageSize = ImageSize;
   DriverInfo->EntryPoint = EntryPoint;
   DriverInfo->ImageSubsystem = ImageSubsystem;
-  if ((EntryPoint != 0) && ((EntryPoint < ImageBase) || (EntryPoint >= (ImageBase + ImageSize)))) {
-    //
-    // If the EntryPoint is not in the range of image buffer, it should come from emulation environment.
-    // So patch ImageBuffer here to align the EntryPoint.
-    //
-    Status = InternalPeCoffGetEntryPoint ((VOID *) (UINTN) ImageBase, &EntryPointInImage);
-    ASSERT_EFI_ERROR (Status);
-    DriverInfo->ImageBase = ImageBase + EntryPoint - (PHYSICAL_ADDRESS) (UINTN) EntryPointInImage;
-  }
   DriverInfo->FileType = FileType;
   DriverInfoData->AllocInfoList = (LIST_ENTRY *) (DriverInfoData + 1);
   InitializeListHead (DriverInfoData->AllocInfoList);
@@ -823,12 +813,10 @@ UnregisterMemoryProfileImage (
   IN LOADED_IMAGE_PRIVATE_DATA      *DriverEntry
   )
 {
-  EFI_STATUS                        Status;
   MEMORY_PROFILE_CONTEXT_DATA       *ContextData;
   MEMORY_PROFILE_DRIVER_INFO_DATA   *DriverInfoData;
   EFI_GUID                          *FileName;
   PHYSICAL_ADDRESS                  ImageAddress;
-  VOID                              *EntryPointInImage;
 
   if (!IS_UEFI_MEMORY_PROFILE_ENABLED) {
     return EFI_UNSUPPORTED;
@@ -846,15 +834,6 @@ UnregisterMemoryProfileImage (
   DriverInfoData = NULL;
   FileName = GetFileNameFromFilePath (DriverEntry->Info.FilePath);
   ImageAddress = DriverEntry->ImageContext.ImageAddress;
-  if ((DriverEntry->ImageContext.EntryPoint < ImageAddress) || (DriverEntry->ImageContext.EntryPoint >= (ImageAddress + DriverEntry->ImageContext.ImageSize))) {
-    //
-    // If the EntryPoint is not in the range of image buffer, it should come from emulation environment.
-    // So patch ImageAddress here to align the EntryPoint.
-    //
-    Status = InternalPeCoffGetEntryPoint ((VOID *) (UINTN) ImageAddress, &EntryPointInImage);
-    ASSERT_EFI_ERROR (Status);
-    ImageAddress = ImageAddress + (UINTN) DriverEntry->ImageContext.EntryPoint - (UINTN) EntryPointInImage;
-  }
   if (FileName != NULL) {
     DriverInfoData = GetMemoryProfileDriverInfoByFileNameAndAddress (ContextData, FileName, ImageAddress);
   }
