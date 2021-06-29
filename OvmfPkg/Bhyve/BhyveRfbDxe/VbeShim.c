@@ -155,6 +155,12 @@ InstallVbeShim (
     DEBUG ((DEBUG_VERBOSE, "%a: failed to allocate page at zero: %r\n",
       __FUNCTION__, Status));
   } else {
+    // FIXME: Write at the end of function
+    /*gDS->SetMemorySpaceAttributes (
+           Segment0,
+           EFI_PAGE_SIZE,
+           EFI_MEMORY_RO
+           );*/
     //
     // We managed to allocate the page at zero. SVN r14218 guarantees that it
     // is NUL-filled.
