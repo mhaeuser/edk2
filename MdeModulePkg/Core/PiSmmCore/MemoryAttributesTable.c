@@ -1041,10 +1041,10 @@ SmmInsertImageRecord (
   //
   // Step 1: record whole region
   //
-  ImageRecord->ImageBase = DriverEntry->ImageBuffer;
-  ImageRecord->ImageSize = EfiPagesToSize(DriverEntry->NumberOfPage);
+  ImageRecord->ImageBase = (UINTN) DriverEntry->SmmLoadedImage.ImageBase;
+  ImageRecord->ImageSize = DriverEntry->SmmLoadedImage.ImageSize;
 
-  ImageAddress = (VOID *)(UINTN)DriverEntry->ImageBuffer;
+  ImageAddress = (VOID *)(UINTN)ImageRecord->ImageBase;
 
   PdbPointer = PeCoffLoaderGetPdbPointer ((VOID*) (UINTN) ImageAddress);
   if (PdbPointer != NULL) {

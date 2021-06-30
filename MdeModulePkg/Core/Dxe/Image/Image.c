@@ -216,8 +216,12 @@ CoreInitializeImageServices (
   Image = &mCorePrivateImage;
 
   Image->EntryPoint         = (EFI_IMAGE_ENTRY_POINT)(UINTN)DxeCoreEntryPoint;
-  Image->ImageBasePage      = DxeCoreImageBaseAddress;
-  Image->NumberOfPages      = (UINTN)(EFI_SIZE_TO_PAGES((UINTN)(DxeCoreImageLength)));
+  // 
+  // The page information of DxeCore is unknown. Because it is only used for 
+  // unloading, and DxeCore cannot unload itself, zero the fields. 
+  // 
+  Image->ImageBasePage      = 0;
+  Image->NumberOfPages      = 0;
   Image->Tpl                = gEfiCurrentTpl;
   Image->Info.SystemTable   = gDxeCoreST;
   Image->Info.ImageBase     = (VOID *)(UINTN)DxeCoreImageBaseAddress;
@@ -855,7 +859,7 @@ Done:
   //
 
   if (DstBufAlocated) {
-    CoreFreePages (Image->ImageContext.ImageAddress, Image->NumberOfPages);
+    CoreFreePages (Image->ImageBasePage, Image->NumberOfPages);
     Image->ImageContext.ImageAddress = 0;
     Image->ImageBasePage = 0;
   }
@@ -939,7 +943,7 @@ CoreUnloadAndCloseImage (
     //
     // If the PE/COFF Emulator protocol exists we must unregister the image.
     //
-    Image->PeCoffEmu->UnregisterImage (Image->PeCoffEmu, Image->ImageBasePage);
+    Image->PeCoffEmu->UnregisterImage (Image->PeCoffEmu, (UINTN) Image->Info.ImageBase);
   }
 
   //
@@ -1594,8 +1598,8 @@ CoreStartImage (
 
   if (Image->PeCoffEmu != NULL) {
     Status = Image->PeCoffEmu->RegisterImage (Image->PeCoffEmu,
-                                 Image->ImageBasePage,
-                                 EFI_PAGES_TO_SIZE (Image->NumberOfPages),
+                                 (UINTN) Image->Info.ImageBase,
+                                 Image->Info.ImageSize,
                                  &Image->EntryPoint);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_LOAD | DEBUG_ERROR,

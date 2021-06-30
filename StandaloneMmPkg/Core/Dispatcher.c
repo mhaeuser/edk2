@@ -386,7 +386,7 @@ MmLoadImage (
     DriverEntry->LoadedImage->DeviceHandle  = NULL;
     DriverEntry->LoadedImage->FilePath      = NULL;
 
-    DriverEntry->LoadedImage->ImageBase     = (VOID *)(UINTN)DriverEntry->ImageBuffer;
+    DriverEntry->LoadedImage->ImageBase     = (VOID *)(UINTN)ImageContext.ImageAddress;
     DriverEntry->LoadedImage->ImageSize     = ImageContext.ImageSize;
     DriverEntry->LoadedImage->ImageCodeType = EfiRuntimeServicesCode;
     DriverEntry->LoadedImage->ImageDataType = EfiRuntimeServicesData;

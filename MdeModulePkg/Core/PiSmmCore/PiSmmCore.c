@@ -810,8 +810,12 @@ SmmCoreInstallLoadedImage (
   mSmmCoreDriverEntry->SmmLoadedImage.ImageDataType = EfiRuntimeServicesData;
 
   mSmmCoreDriverEntry->ImageEntryPoint = gSmmCorePrivate->PiSmmCoreEntryPoint;
-  mSmmCoreDriverEntry->ImageBuffer     = gSmmCorePrivate->PiSmmCoreImageBase;
-  mSmmCoreDriverEntry->NumberOfPage    = EFI_SIZE_TO_PAGES((UINTN)gSmmCorePrivate->PiSmmCoreImageSize);
+  // 
+  // The page information of PiSmmCore is unknown. Because it is only used for 
+  // unloading, and PiSmmCore cannot unload itself, zero the fields. 
+  // 
+  mSmmCoreDriverEntry->ImageBuffer     = 0;
+  mSmmCoreDriverEntry->NumberOfPage    = 0;
 
   //
   // Create a new image handle in the SMM handle database for the SMM Driver
