@@ -29,6 +29,7 @@ DiscoverPeimsAndOrderWithApriori (
   EFI_PEI_FILE_HANDLE                 FileHandle;
   EFI_PEI_FILE_HANDLE                 AprioriFileHandle;
   EFI_GUID                            *Apriori;
+  UINT32                              AprioriSize;
   UINTN                               Index;
   UINTN                               Index2;
   UINTN                               PeimIndex;
@@ -130,7 +131,7 @@ DiscoverPeimsAndOrderWithApriori (
     //
     // Read the Apriori file
     //
-    Status = FvPpi->FindSectionByType (FvPpi, EFI_SECTION_RAW, AprioriFileHandle, (VOID **) &Apriori);
+    Status = FvPpi->FindSectionByType (FvPpi, EFI_SECTION_RAW, AprioriFileHandle, (VOID **) &Apriori, &AprioriSize);
     if (!EFI_ERROR (Status)) {
       //
       // Calculate the number of PEIMs in the Apriori file
@@ -972,6 +973,7 @@ MigratePeim (
   EFI_FFS_FILE_HEADER       *FileHeader;
   VOID                      *Pe32Data;
   VOID                      *ImageAddress;
+  UINT32                    ImageSize;
   CHAR8                     *AsciiString;
   UINTN                     Index;
 
@@ -981,7 +983,7 @@ MigratePeim (
   ASSERT (!IS_FFS_FILE2 (FileHeader));
 
   ImageAddress = NULL;
-  PeiGetPe32Data (MigratedFileHandle, &ImageAddress);
+  PeiGetPe32Data (MigratedFileHandle, &ImageAddress, &ImageSize);
   if (ImageAddress != NULL) {
     DEBUG_CODE_BEGIN ();
     AsciiString = PeCoffLoaderGetPdbPointer (ImageAddress);
@@ -1090,6 +1092,7 @@ MigrateSecModulesInFv (
   UINT32                      FileSize;
   VOID                        *OrgPe32SectionData;
   VOID                        *Pe32SectionData;
+  UINT32                      Pe32SectionDataSize;
   EFI_FFS_FILE_HEADER         *FfsFileHeader;
   EFI_COMMON_SECTION_HEADER   *Section;
   BOOLEAN                     IsFfs3Fv;
@@ -1136,6 +1139,7 @@ MigrateSecModulesInFv (
                 Section,
                 FileSize,
                 &Pe32SectionData,
+                &Pe32SectionDataSize,
                 &SectionAuthenticationStatus,
                 IsFfs3Fv
                 );
@@ -1745,6 +1749,7 @@ DepexSatisfied (
 {
   EFI_STATUS           Status;
   VOID                 *DepexData;
+  UINT32               DepexDataSize;
   EFI_FV_FILE_INFO     FileInfo;
 
   Status = PeiServicesFfsGetFileInfo (FileHandle, &FileInfo);
@@ -1768,7 +1773,8 @@ DepexSatisfied (
   Status = PeiServicesFfsFindSectionData (
               EFI_SECTION_PEI_DEPEX,
               FileHandle,
-              (VOID **)&DepexData
+              (VOID **)&DepexData,
+              &DepexDataSize
               );
 
   if (EFI_ERROR (Status)) {

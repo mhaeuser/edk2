@@ -522,7 +522,8 @@ LoadAndRelocatePeCoffImageInPlace (
 EFI_STATUS
 PeiGetPe32Data (
   IN     EFI_PEI_FILE_HANDLE  FileHandle,
-  OUT    VOID                 **Pe32Data
+  OUT    VOID                 **Pe32Data,
+  OUT    UINT32               *Pe32DataSize
   )
 {
   EFI_STATUS                  Status;
@@ -531,6 +532,7 @@ PeiGetPe32Data (
   UINT32                      AuthenticationState;
 
   *Pe32Data = NULL;
+  *Pe32DataSize = 0;
 
   if (FeaturePcdGet (PcdPeiCoreImageLoaderSearchTeSectionFirst)) {
     SearchType1 = EFI_SECTION_TE;
@@ -549,6 +551,7 @@ PeiGetPe32Data (
              0,
              FileHandle,
              Pe32Data,
+             Pe32DataSize,
              &AuthenticationState
              );
   //
@@ -560,6 +563,7 @@ PeiGetPe32Data (
                0,
                FileHandle,
                Pe32Data,
+               Pe32DataSize,
                &AuthenticationState
                );
   }
@@ -598,6 +602,7 @@ PeiLoadImageLoadImage (
 {
   EFI_STATUS                  Status;
   VOID                        *Pe32Data;
+  UINT32                      Pe32DataSize;
   EFI_PHYSICAL_ADDRESS        ImageAddress;
   UINT64                      ImageSize;
   EFI_PHYSICAL_ADDRESS        ImageEntryPoint;
@@ -626,6 +631,7 @@ PeiLoadImageLoadImage (
              0,
              FileHandle,
              &Pe32Data,
+             &Pe32DataSize,
              AuthenticationState
              );
   //
@@ -637,6 +643,7 @@ PeiLoadImageLoadImage (
                0,
                FileHandle,
                &Pe32Data,
+               &Pe32DataSize,
                AuthenticationState
                );
     if (EFI_ERROR (Status)) {

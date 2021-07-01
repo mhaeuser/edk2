@@ -221,7 +221,8 @@ EFI_STATUS
   IN  CONST EFI_PEI_FIRMWARE_VOLUME_PPI    *This,
   IN  EFI_SECTION_TYPE                     SearchType,
   IN  EFI_PEI_FILE_HANDLE                  FileHandle,
-  OUT VOID                                 **SectionData
+  OUT VOID                                 **SectionData,
+  OUT UINT32                               *SectionSize
 );
 
 /**
@@ -255,6 +256,7 @@ EFI_STATUS
   IN  UINTN                                SearchInstance,
   IN  EFI_PEI_FILE_HANDLE                  FileHandle,
   OUT VOID                                 **SectionData,
+  OUT UINT32                               *SectionSize,
   OUT UINT32                               *AuthenticationStatus
 );
 

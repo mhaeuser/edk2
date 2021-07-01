@@ -386,7 +386,8 @@ EFI_STATUS
   IN CONST EFI_PEI_SERVICES            **PeiServices,
   IN EFI_SECTION_TYPE                  SectionType,
   IN EFI_PEI_FILE_HANDLE               FileHandle,
-  OUT VOID                             **SectionData
+  OUT VOID                             **SectionData,
+  OUT UINT32                           *SectionDataSize
   );
 
 /**
@@ -418,6 +419,7 @@ EFI_STATUS
   IN UINTN                             SectionInstance,
   IN EFI_PEI_FILE_HANDLE               FileHandle,
   OUT VOID                             **SectionData,
+  OUT UINT32                           *SectionDataSize,
   OUT UINT32                           *AuthenticationStatus
   );
 

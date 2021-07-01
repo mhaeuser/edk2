@@ -217,7 +217,8 @@ EFI_STATUS
 SecFfsFindSectionData (
   IN EFI_SECTION_TYPE      SectionType,
   IN EFI_FFS_FILE_HEADER   *FfsFileHeader,
-  IN OUT VOID              **SectionData
+  IN OUT VOID              **SectionData,
+  OUT    UINT32            *SectionDataSize
   )
 /*++
 

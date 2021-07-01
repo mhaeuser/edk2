@@ -106,6 +106,7 @@ main (
   BOOLEAN               Done;
   EFI_PEI_FILE_HANDLE   FileHandle;
   VOID                  *SecFile;
+  UINT32                SecFileSize;
   CHAR16                *MemorySizeStr;
   CHAR16                *FirmwareVolumesStr;
   UINTN                 *StackPointer;
@@ -271,7 +272,7 @@ main (
                   &FileHandle
                   );
       if (!EFI_ERROR (Status)) {
-        Status = PeiServicesFfsFindSectionData (EFI_SECTION_PE32, FileHandle, &SecFile);
+        Status = PeiServicesFfsFindSectionData (EFI_SECTION_PE32, FileHandle, &SecFile, &SecFileSize);
         if (!EFI_ERROR (Status)) {
           PeiIndex = Index;
           printf (" contains SEC Core");

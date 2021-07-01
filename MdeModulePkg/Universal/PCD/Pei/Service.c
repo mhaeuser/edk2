@@ -391,12 +391,13 @@ LocateExPcdBinary (
 {
   EFI_STATUS            Status;
   VOID                  *PcdDb;
+  UINT32                PcdDbSize;
 
   PcdDb       = NULL;
 
   ASSERT (FileHandle != NULL);
 
-  Status = PeiServicesFfsFindSectionData (EFI_SECTION_RAW, FileHandle, &PcdDb);
+  Status = PeiServicesFfsFindSectionData (EFI_SECTION_RAW, FileHandle, &PcdDb, &PcdDbSize);
   ASSERT_EFI_ERROR (Status);
 
   //

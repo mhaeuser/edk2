@@ -389,6 +389,7 @@ Returns:
   BOOLEAN               Done;
   EFI_PEI_FILE_HANDLE   FileHandle;
   VOID                  *SecFile;
+  UINT32                SecFileSize;
   CHAR16                *MemorySizeStr;
   CHAR16                *FirmwareVolumesStr;
   UINTN                 ProcessAffinityMask;
@@ -559,7 +560,7 @@ Returns:
                   &FileHandle
                   );
       if (!EFI_ERROR (Status)) {
-        Status = PeiServicesFfsFindSectionData (EFI_SECTION_PE32, FileHandle, &SecFile);
+        Status = PeiServicesFfsFindSectionData (EFI_SECTION_PE32, FileHandle, &SecFile, &SecFileSize);
         if (!EFI_ERROR (Status)) {
           SecPrint (" contains SEC Core");
         }

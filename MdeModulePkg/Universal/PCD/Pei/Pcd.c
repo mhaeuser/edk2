@@ -246,6 +246,7 @@ EndOfPeiSignalPpiNotifyCallback (
   EFI_PEI_FV_HANDLE      VolumeHandle;
   EFI_PEI_FILE_HANDLE    FileHandle;
   VOID                   *PcdDb;
+  UINT32                 PcdDbSize;
   UINT32                 Length;
   PEI_PCD_DATABASE       *PeiPcdDb;
 
@@ -302,7 +303,7 @@ EndOfPeiSignalPpiNotifyCallback (
   //
   // Find PEI PcdDb and Build second PcdDB GuidHob
   //
-  Status = PeiServicesFfsFindSectionData (EFI_SECTION_RAW, FileHandle, &PcdDb);
+  Status = PeiServicesFfsFindSectionData (EFI_SECTION_RAW, FileHandle, &PcdDb, &PcdDbSize);
   ASSERT_EFI_ERROR (Status);
   Length = PeiPcdDb->LengthForAllSkus;
   Database = BuildGuidHob (&gPcdDataBaseHobGuid, Length);
@@ -465,6 +466,7 @@ PeiPcdSetSku (
   EFI_PEI_FV_HANDLE     VolumeHandle;
   EFI_PEI_FILE_HANDLE   FileHandle;
   VOID                  *PcdDb;
+  UINT32                PcdDbSize;
   UINT32                Length;
   PCD_DATABASE_SKU_DELTA *SkuDelta;
   PCD_DATA_DELTA         *SkuDeltaData;
@@ -537,7 +539,7 @@ PeiPcdSetSku (
     //
     // Find the delta data between the different Skus
     //
-    Status = PeiServicesFfsFindSectionData (EFI_SECTION_RAW, FileHandle, &PcdDb);
+    Status = PeiServicesFfsFindSectionData (EFI_SECTION_RAW, FileHandle, &PcdDb, &PcdDbSize);
     ASSERT_EFI_ERROR (Status);
     Length = PeiPcdDb->LengthForAllSkus;
     Index  = (PeiPcdDb->Length + 7) & (~7);

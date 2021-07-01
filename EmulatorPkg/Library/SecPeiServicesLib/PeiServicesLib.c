@@ -26,7 +26,8 @@ EFI_STATUS
 SecFfsFindSectionData (
   IN EFI_SECTION_TYPE           SectionType,
   IN EFI_PEI_FILE_HANDLE        FileHandle,
-  OUT VOID                      **SectionData
+  OUT VOID                      **SectionData,
+  OUT UINT32                    *SectionDataSize
   );
 
 
@@ -301,10 +302,11 @@ EFIAPI
 PeiServicesFfsFindSectionData (
   IN EFI_SECTION_TYPE           SectionType,
   IN EFI_PEI_FILE_HANDLE        FileHandle,
-  OUT VOID                      **SectionData
+  OUT VOID                      **SectionData,
+  OUT UINT32                    *SectionDataSize
   )
 {
-  return SecFfsFindSectionData (SectionType, FileHandle, SectionData);
+  return SecFfsFindSectionData (SectionType, FileHandle, SectionData, SectionDataSize);
 }
 
 /**

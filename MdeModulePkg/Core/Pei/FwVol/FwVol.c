@@ -556,6 +556,7 @@ FirmwareVolumeInfoPpiNotifyCallback (
   UINTN                                 FvIndex;
   EFI_PEI_FILE_HANDLE                   FileHandle;
   VOID                                  *DepexData;
+  UINT32                                DepexDataSize;
   BOOLEAN                               IsFvInfo2;
   UINTN                                 CurFvCount;
   VOID                                  *TempPtr;
@@ -676,7 +677,8 @@ FirmwareVolumeInfoPpiNotifyCallback (
                           FvPpi,
                           EFI_SECTION_PEI_DEPEX,
                           FileHandle,
-                          (VOID**)&DepexData
+                          (VOID**)&DepexData,
+                          &DepexDataSize
                           );
         if (!EFI_ERROR (Status)) {
           if (!PeimDispatchReadiness (PeiServices, DepexData)) {
@@ -776,6 +778,7 @@ ProcessSection (
   IN EFI_COMMON_SECTION_HEADER  *Section,
   IN UINTN                      SectionSize,
   OUT VOID                      **OutputBuffer,
+  OUT UINT32                    *OutputBufferSize,
   OUT UINT32                    *AuthenticationStatus,
   IN BOOLEAN                    IsFfs3Fv
   )
@@ -793,16 +796,18 @@ ProcessSection (
   EFI_GUID                                *SectionDefinitionGuid;
   BOOLEAN                                 SectionCached;
   VOID                                    *TempOutputBuffer;
+  UINT32                                  TempOutputBufferSize;
   UINT32                                  TempAuthenticationStatus;
   UINT16                                  GuidedSectionAttributes;
 
-  PrivateData   = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
-  *OutputBuffer = NULL;
-  ParsedLength  = 0;
-  Index         = 0;
-  Status        = EFI_NOT_FOUND;
-  PpiOutput     = NULL;
-  PpiOutputSize = 0;
+  PrivateData       = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
+  *OutputBuffer     = NULL;
+  *OutputBufferSize = 0;
+  ParsedLength      = 0;
+  Index             = 0;
+  Status            = EFI_NOT_FOUND;
+  PpiOutput         = NULL;
+  PpiOutputSize     = 0;
   while (ParsedLength < SectionSize) {
 
     if (IS_SECTION2 (Section)) {
@@ -832,10 +837,23 @@ ProcessSection (
         // Got it!
         //
         if (IS_SECTION2 (Section)) {
+          SectionLength = SECTION2_SIZE (Section);
+          if (SectionLength < sizeof (EFI_COMMON_SECTION_HEADER2)) {
+            return EFI_VOLUME_CORRUPTED;
+          }
+
           *OutputBuffer = (VOID *)((UINT8 *) Section + sizeof (EFI_COMMON_SECTION_HEADER2));
         } else {
+          SectionLength = SECTION_SIZE (Section);
+          if (SectionLength < sizeof (EFI_COMMON_SECTION_HEADER)) {
+            return EFI_VOLUME_CORRUPTED;
+          }
+
           *OutputBuffer = (VOID *)((UINT8 *) Section + sizeof (EFI_COMMON_SECTION_HEADER));
         }
+
+        *OutputBufferSize = SectionLength;
+        
         return EFI_SUCCESS;
       } else {
         if (IS_SECTION2 (Section)) {
@@ -875,11 +893,13 @@ ProcessSection (
                      PpiOutput,
                      PpiOutputSize,
                      &TempOutputBuffer,
+                     &TempOutputBufferSize,
                      &TempAuthenticationStatus,
                      IsFfs3Fv
                    );
           if (!EFI_ERROR (Status)) {
             *OutputBuffer = TempOutputBuffer;
+            *OutputBufferSize = TempOutputBufferSize;
             *AuthenticationStatus = TempAuthenticationStatus | Authentication;
             return EFI_SUCCESS;
           }
@@ -959,11 +979,13 @@ ProcessSection (
                      PpiOutput,
                      PpiOutputSize,
                      &TempOutputBuffer,
+                     &TempOutputBufferSize,
                      &TempAuthenticationStatus,
                      IsFfs3Fv
                    );
           if (!EFI_ERROR (Status)) {
             *OutputBuffer = TempOutputBuffer;
+            *OutputBufferSize = TempOutputBufferSize;
             *AuthenticationStatus = TempAuthenticationStatus | Authentication;
             return EFI_SUCCESS;
           }
@@ -1009,7 +1031,8 @@ PeiFfsFindSectionData (
   IN CONST EFI_PEI_SERVICES    **PeiServices,
   IN     EFI_SECTION_TYPE      SectionType,
   IN     EFI_PEI_FILE_HANDLE   FileHandle,
-  OUT VOID                     **SectionData
+  OUT VOID                     **SectionData,
+  OUT UINT32                   *SectionDataSize
   )
 {
   PEI_CORE_FV_HANDLE           *CoreFvHandle;
@@ -1019,7 +1042,7 @@ PeiFfsFindSectionData (
     return EFI_NOT_FOUND;
   }
 
-  return CoreFvHandle->FvPpi->FindSectionByType (CoreFvHandle->FvPpi, SectionType, FileHandle, SectionData);
+  return CoreFvHandle->FvPpi->FindSectionByType (CoreFvHandle->FvPpi, SectionType, FileHandle, SectionData, SectionDataSize);
 }
 
 /**
@@ -1044,6 +1067,7 @@ PeiFfsFindSectionData3 (
   IN     UINTN                 SectionInstance,
   IN     EFI_PEI_FILE_HANDLE   FileHandle,
   OUT VOID                     **SectionData,
+  OUT UINT32                   *SectionDataSize,
   OUT UINT32                   *AuthenticationStatus
   )
 {
@@ -1056,7 +1080,7 @@ PeiFfsFindSectionData3 (
 
   if ((CoreFvHandle->FvPpi->Signature == EFI_PEI_FIRMWARE_VOLUME_PPI_SIGNATURE) &&
       (CoreFvHandle->FvPpi->Revision == EFI_PEI_FIRMWARE_VOLUME_PPI_REVISION)) {
-    return CoreFvHandle->FvPpi->FindSectionByType2 (CoreFvHandle->FvPpi, SectionType, SectionInstance, FileHandle, SectionData, AuthenticationStatus);
+    return CoreFvHandle->FvPpi->FindSectionByType2 (CoreFvHandle->FvPpi, SectionType, SectionInstance, FileHandle, SectionData, SectionDataSize, AuthenticationStatus);
   }
   //
   // The old FvPpi doesn't support to find section by section instance
@@ -1387,6 +1411,7 @@ ProcessFvFile (
   EFI_PEI_FIRMWARE_VOLUME_PPI   *ParentFvPpi;
   EFI_PEI_FV_HANDLE             ParentFvHandle;
   EFI_FIRMWARE_VOLUME_HEADER    *FvHeader;
+  UINT32                        FvHeaderSize;
   EFI_FV_FILE_INFO              FileInfo;
   UINT64                        FvLength;
   UINT32                        AuthenticationStatus;
@@ -1429,6 +1454,7 @@ ProcessFvFile (
                               Index,
                               ParentFvFileHandle,
                               (VOID **)&FvHeader,
+                              &FvHeaderSize,
                               &AuthenticationStatus
                               );
     } else {
@@ -1443,7 +1469,8 @@ ProcessFvFile (
                               ParentFvPpi,
                               EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
                               ParentFvFileHandle,
-                              (VOID **)&FvHeader
+                              (VOID **)&FvHeader,
+                              &FvHeaderSize
                               );
     }
     if (EFI_ERROR (Status)) {
@@ -1960,11 +1987,12 @@ PeiFfsFvPpiFindSectionByType (
   IN  CONST EFI_PEI_FIRMWARE_VOLUME_PPI    *This,
   IN        EFI_SECTION_TYPE               SearchType,
   IN        EFI_PEI_FILE_HANDLE            FileHandle,
-  OUT VOID                                 **SectionData
+  OUT VOID                                 **SectionData,
+  OUT UINT32                               *SectionDataSize
   )
 {
   UINT32 AuthenticationStatus;
-  return PeiFfsFvPpiFindSectionByType2 (This, SearchType, 0, FileHandle, SectionData, &AuthenticationStatus);
+  return PeiFfsFvPpiFindSectionByType2 (This, SearchType, 0, FileHandle, SectionData, SectionDataSize, &AuthenticationStatus);
 }
 
 /**
@@ -1998,6 +2026,7 @@ PeiFfsFvPpiFindSectionByType2 (
   IN        UINTN                          SearchInstance,
   IN        EFI_PEI_FILE_HANDLE            FileHandle,
   OUT VOID                                 **SectionData,
+  OUT UINT32                               *SectionSize,
   OUT UINT32                               *AuthenticationStatus
   )
 {
@@ -2010,7 +2039,7 @@ PeiFfsFvPpiFindSectionByType2 (
   UINTN                                   Instance;
   UINT32                                  ExtractedAuthenticationStatus;
 
-  if (SectionData == NULL) {
+  if (SectionData == NULL || SectionSize == NULL) {
     return EFI_NOT_FOUND;
   }
 
@@ -2048,6 +2077,7 @@ PeiFfsFvPpiFindSectionByType2 (
              Section,
              FileSize,
              SectionData,
+             SectionSize,
              &ExtractedAuthenticationStatus,
              FwVolInstance->IsFfs3Fv
              );
@@ -2327,6 +2357,7 @@ ThirdPartyFvPpiNotifyCallback (
   UINTN                        FvIndex;
   EFI_PEI_FILE_HANDLE          FileHandle;
   VOID                         *DepexData;
+  UINT32                       DepexDataSize;
   UINTN                        CurFvCount;
   VOID                         *TempPtr;
 
@@ -2415,7 +2446,8 @@ ThirdPartyFvPpiNotifyCallback (
                           FvPpi,
                           EFI_SECTION_PEI_DEPEX,
                           FileHandle,
-                          (VOID**)&DepexData
+                          (VOID**)&DepexData,
+                          &DepexDataSize
                           );
         if (!EFI_ERROR (Status)) {
           if (!PeimDispatchReadiness (PeiServices, DepexData)) {

@@ -150,7 +150,8 @@ PeiFfsFvPpiFindSectionByType (
   IN  CONST EFI_PEI_FIRMWARE_VOLUME_PPI    *This,
   IN        EFI_SECTION_TYPE               SearchType,
   IN        EFI_PEI_FILE_HANDLE            FileHandle,
-  OUT VOID                                 **SectionData
+  OUT VOID                                 **SectionData,
+  OUT UINT32                               *SectionDataSize
   );
 
 /**
@@ -184,6 +185,7 @@ PeiFfsFvPpiFindSectionByType2 (
   IN        UINTN                          SearchInstance,
   IN        EFI_PEI_FILE_HANDLE            FileHandle,
   OUT VOID                                 **SectionData,
+  OUT UINT32                               *SectionDataSize,
   OUT UINT32                               *AuthenticationStatus
   );
 

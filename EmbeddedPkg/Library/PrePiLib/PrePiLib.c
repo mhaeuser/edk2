@@ -128,6 +128,7 @@ LoadDxeCoreFromFfsFile (
 {
   EFI_STATUS              Status;
   VOID                    *PeCoffImage;
+  UINT32                  PeCoffImageSize;
   EFI_PHYSICAL_ADDRESS    ImageAddress;
   UINT64                  ImageSize;
   EFI_PHYSICAL_ADDRESS    EntryPoint;
@@ -136,7 +137,7 @@ LoadDxeCoreFromFfsFile (
   VOID                    *Hob;
   EFI_FV_FILE_INFO        FvFileInfo;
 
-  Status = FfsFindSectionData (EFI_SECTION_PE32, FileHandle, &PeCoffImage);
+  Status = FfsFindSectionData (EFI_SECTION_PE32, FileHandle, &PeCoffImage, &PeCoffImageSize);
   if (EFI_ERROR  (Status)) {
     return Status;
   }

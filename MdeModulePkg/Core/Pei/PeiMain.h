@@ -915,6 +915,7 @@ ProcessSection (
   IN EFI_COMMON_SECTION_HEADER  *Section,
   IN UINTN                      SectionSize,
   OUT VOID                      **OutputBuffer,
+  OUT UINT32                    *OutputBufferSize,
   OUT UINT32                    *AuthenticationStatus,
   IN BOOLEAN                    IsFfs3Fv
   );
@@ -938,7 +939,8 @@ PeiFfsFindSectionData (
   IN CONST EFI_PEI_SERVICES    **PeiServices,
   IN     EFI_SECTION_TYPE      SectionType,
   IN     EFI_PEI_FILE_HANDLE   FileHandle,
-  OUT VOID                     **SectionData
+  OUT VOID                     **SectionData,
+  OUT UINT32                   *SectionDataSize
   );
 
 /**
@@ -963,6 +965,7 @@ PeiFfsFindSectionData3 (
   IN     UINTN                 SectionInstance,
   IN     EFI_PEI_FILE_HANDLE   FileHandle,
   OUT VOID                     **SectionData,
+  OUT UINT32                   *SectionDataSize,
   OUT UINT32                   *AuthenticationStatus
   );
 
@@ -1416,7 +1419,8 @@ LoadAndRelocatePeCoffImageInPlace (
 EFI_STATUS
 PeiGetPe32Data (
   IN     EFI_PEI_FILE_HANDLE          FileHandle,
-  OUT    VOID                         **Pe32Data
+  OUT    VOID                         **Pe32Data,
+  OUT    UINT32                       *Pe32DataSize
   );
 
 /**

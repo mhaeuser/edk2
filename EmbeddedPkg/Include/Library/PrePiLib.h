@@ -71,7 +71,8 @@ EFIAPI
 FfsFindSectionData (
   IN EFI_SECTION_TYPE           SectionType,
   IN EFI_PEI_FILE_HANDLE        FileHandle,
-  OUT VOID                      **SectionData
+  OUT VOID                      **SectionData,
+  OUT UINT32                    *SectionDataSize
   );
 
 

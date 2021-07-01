@@ -286,13 +286,14 @@ EFIAPI
 PeiServicesFfsFindSectionData (
   IN EFI_SECTION_TYPE           SectionType,
   IN EFI_PEI_FILE_HANDLE        FileHandle,
-  OUT VOID                      **SectionData
+  OUT VOID                      **SectionData,
+  OUT UINT32                    *SectionDataSize
   )
 {
   CONST EFI_PEI_SERVICES **PeiServices;
 
   PeiServices = GetPeiServicesTablePointer ();
-  return (*PeiServices)->FfsFindSectionData (PeiServices, SectionType, FileHandle, SectionData);
+  return (*PeiServices)->FfsFindSectionData (PeiServices, SectionType, FileHandle, SectionData, SectionDataSize);
 }
 
 /**
@@ -316,13 +317,14 @@ PeiServicesFfsFindSectionData3 (
   IN UINTN                      SectionInstance,
   IN EFI_PEI_FILE_HANDLE        FileHandle,
   OUT VOID                      **SectionData,
+  OUT UINT32                    *SectionDataSize,
   OUT UINT32                    *AuthenticationStatus
   )
 {
   CONST EFI_PEI_SERVICES **PeiServices;
 
   PeiServices = GetPeiServicesTablePointer ();
-  return (*PeiServices)->FindSectionData3 (PeiServices, SectionType, SectionInstance, FileHandle, SectionData, AuthenticationStatus);
+  return (*PeiServices)->FindSectionData3 (PeiServices, SectionType, SectionInstance, FileHandle, SectionData, SectionDataSize, AuthenticationStatus);
 }
 
 /**

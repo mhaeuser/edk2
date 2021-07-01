@@ -46,6 +46,7 @@ PeiLoadFileLoadPayload (
 {
   EFI_STATUS                    Status;
   VOID                          *Elf;
+  UINT32                        ElfSize;
   UNIVERSAL_PAYLOAD_EXTRA_DATA  *ExtraData;
   ELF_IMAGE_CONTEXT             Context;
   UNIVERSAL_PAYLOAD_INFO_HEADER *PldInfo;
@@ -64,7 +65,7 @@ PeiLoadFileLoadPayload (
   //
   Instance = 0;
   do {
-    Status = PeiServicesFfsFindSectionData3 (EFI_SECTION_RAW, Instance++, FileHandle, &Elf, AuthenticationState);
+    Status = PeiServicesFfsFindSectionData3 (EFI_SECTION_RAW, Instance++, FileHandle, &Elf, &ElfSize, AuthenticationState);
     if (EFI_ERROR (Status)) {
       return Status;
     }

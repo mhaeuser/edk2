@@ -1071,6 +1071,7 @@ ConvertPeiCorePpiPointers (
   UINTN                 PeiCoreModuleSize;
   EFI_PEI_FILE_HANDLE   PeiCoreFileHandle;
   VOID                  *PeiCoreImageBase;
+  UINT32                PeiCoreImageSize;
   VOID                  *PeiCoreEntryPoint;
   EFI_STATUS            Status;
 
@@ -1091,7 +1092,7 @@ ConvertPeiCorePpiPointers (
     Status = CoreFvHandle->FvPpi->GetFileInfo (CoreFvHandle->FvPpi, PeiCoreFileHandle, &FileInfo);
     ASSERT_EFI_ERROR (Status);
 
-    Status = PeiGetPe32Data (PeiCoreFileHandle, &PeiCoreImageBase);
+    Status = PeiGetPe32Data (PeiCoreFileHandle, &PeiCoreImageBase, &PeiCoreImageSize);
     ASSERT_EFI_ERROR (Status);
 
     //

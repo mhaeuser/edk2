@@ -211,7 +211,8 @@ EFIAPI
 PeiServicesFfsFindSectionData (
   IN EFI_SECTION_TYPE           SectionType,
   IN EFI_PEI_FILE_HANDLE        FileHandle,
-  OUT VOID                      **SectionData
+  OUT VOID                      **SectionData,
+  OUT UINT32                    *SectionSize
   );
 
 /**
@@ -235,6 +236,7 @@ PeiServicesFfsFindSectionData3 (
   IN UINTN                      SectionInstance,
   IN EFI_PEI_FILE_HANDLE        FileHandle,
   OUT VOID                      **SectionData,
+  OUT UINT32                    *SectionSize,
   OUT UINT32                    *AuthenticationStatus
   );
 

@@ -70,6 +70,7 @@ _ModuleEntryPoint (
   EFI_PEI_FV_HANDLE         VolumeHandle;
   EFI_PEI_FILE_HANDLE       FileHandle;
   VOID                      *PeCoffImage;
+  UINT32                    PeCoffImageSize;
   EFI_PEI_CORE_ENTRY_POINT  EntryPoint;
   EFI_PEI_PPI_DESCRIPTOR    *Ppi;
   EFI_PEI_PPI_DESCRIPTOR    *SecPpiList;
@@ -123,7 +124,7 @@ _ModuleEntryPoint (
   Status = PeiServicesFfsFindNextFile (EFI_FV_FILETYPE_PEI_CORE, VolumeHandle, &FileHandle);
   ASSERT_EFI_ERROR (Status);
 
-  Status = PeiServicesFfsFindSectionData (EFI_SECTION_PE32, FileHandle, &PeCoffImage);
+  Status = PeiServicesFfsFindSectionData (EFI_SECTION_PE32, FileHandle, &PeCoffImage, &PeCoffImageSize);
   ASSERT_EFI_ERROR (Status);
 
   Status = PeCoffLoaderGetEntryPoint (PeCoffImage, (VOID **)&EntryPoint);
