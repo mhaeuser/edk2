@@ -359,16 +359,22 @@ FfsFindSectionData (
   ParsedLength  = 0;
   while (ParsedLength < FileSize) {
     if (Section->Type == SectionType) {
+      //
+      // Size is 24 bits wide so mask upper 8 bits.
+      //
+      SectionLength = SECTION_SIZE (Section);
+
+      if (SectionLength < sizeof (*Section)) {
+        return EFI_VOLUME_CORRUPTED;
+      }
       *SectionData = (VOID *) (Section + 1);
-      *SectionDataSize = SECTION_SIZE(Section);
+      *SectionDataSize = SectionLength - sizeof (*Section);
       return EFI_SUCCESS;
     }
     //
-    // Size is 24 bits wide so mask upper 8 bits.
     // SectionLength is adjusted it is 4 byte aligned.
     // Go to the next section
     //
-    SectionLength = SECTION_SIZE(Section);
     SectionLength = GET_OCCUPIED_SIZE (SectionLength, 4);
 
     ParsedLength += SectionLength;
