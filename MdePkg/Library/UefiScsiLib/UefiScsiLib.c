@@ -964,8 +964,8 @@ ScsiRead10Command (
   // Fill Cdb for Read (10) Command
   //
   Cdb[0]                        = EFI_SCSI_OP_READ10;
-  WriteUnaligned32 ((UINT32 *)&Cdb[2], SwapBytes32 (StartLba));
-  WriteUnaligned16 ((UINT16 *)&Cdb[7], SwapBytes16 ((UINT16) SectorSize));
+  WriteUnaligned32 (&Cdb[2], SwapBytes32 (StartLba));
+  WriteUnaligned16 (&Cdb[7], SwapBytes16 ((UINT16) SectorSize));
 
   CommandPacket.CdbLength       = EFI_SCSI_OP_LENGTH_TEN;
   CommandPacket.DataDirection   = EFI_SCSI_DATA_IN;
@@ -1065,8 +1065,8 @@ ScsiWrite10Command (
   //
   Cdb[0]                        = EFI_SCSI_OP_WRITE10;
   Cdb[1]                        = EFI_SCSI_BLOCK_FUA;
-  WriteUnaligned32 ((UINT32 *)&Cdb[2], SwapBytes32 (StartLba));
-  WriteUnaligned16 ((UINT16 *)&Cdb[7], SwapBytes16 ((UINT16) SectorSize));
+  WriteUnaligned32 (&Cdb[2], SwapBytes32 (StartLba));
+  WriteUnaligned16 (&Cdb[7], SwapBytes16 ((UINT16) SectorSize));
 
   CommandPacket.CdbLength       = EFI_SCSI_OP_LENGTH_TEN;
   CommandPacket.DataDirection   = EFI_SCSI_DATA_OUT;
@@ -1164,8 +1164,8 @@ ScsiRead16Command (
   // Fill Cdb for Read (16) Command
   //
   Cdb[0]                        = EFI_SCSI_OP_READ16;
-  WriteUnaligned64 ((UINT64 *)&Cdb[2], SwapBytes64 (StartLba));
-  WriteUnaligned32 ((UINT32 *)&Cdb[10], SwapBytes32 (SectorSize));
+  WriteUnaligned64 (&Cdb[2], SwapBytes64 (StartLba));
+  WriteUnaligned32 (&Cdb[10], SwapBytes32 (SectorSize));
 
   CommandPacket.CdbLength       = EFI_SCSI_OP_LENGTH_SIXTEEN;
   CommandPacket.DataDirection   = EFI_SCSI_DATA_IN;
@@ -1265,8 +1265,8 @@ ScsiWrite16Command (
   //
   Cdb[0]                        = EFI_SCSI_OP_WRITE16;
   Cdb[1]                        = EFI_SCSI_BLOCK_FUA;
-  WriteUnaligned64 ((UINT64 *)&Cdb[2], SwapBytes64 (StartLba));
-  WriteUnaligned32 ((UINT32 *)&Cdb[10], SwapBytes32 (SectorSize));
+  WriteUnaligned64 (&Cdb[2], SwapBytes64 (StartLba));
+  WriteUnaligned32 (&Cdb[10], SwapBytes32 (SectorSize));
 
   CommandPacket.CdbLength       = EFI_SCSI_OP_LENGTH_SIXTEEN;
   CommandPacket.DataDirection   = EFI_SCSI_DATA_OUT;
@@ -1372,16 +1372,16 @@ ScsiSecurityProtocolInCommand (
   //
   Cdb[0]                        = EFI_SCSI_OP_SECURITY_PROTOCOL_IN;
   Cdb[1]                        = SecurityProtocol;
-  WriteUnaligned16 ((UINT16 *)&Cdb[2], SwapBytes16 (SecurityProtocolSpecific));
+  WriteUnaligned16 (&Cdb[2], SwapBytes16 (SecurityProtocolSpecific));
 
   if (Inc512) {
     if (DataLength % 512 != 0) {
       return EFI_INVALID_PARAMETER;
     }
     Cdb[4]                      = BIT7;
-    WriteUnaligned32 ((UINT32 *)&Cdb[6], SwapBytes32 ((UINT32) DataLength / 512));
+    WriteUnaligned32 (&Cdb[6], SwapBytes32 ((UINT32) DataLength / 512));
   } else {
-    WriteUnaligned32 ((UINT32 *)&Cdb[6], SwapBytes32 ((UINT32) DataLength));
+    WriteUnaligned32 (&Cdb[6], SwapBytes32 ((UINT32) DataLength));
   }
 
   CommandPacket.CdbLength       = EFI_SCSI_OP_LENGTH_TWELVE;
@@ -1483,16 +1483,16 @@ ScsiSecurityProtocolOutCommand (
   //
   Cdb[0]                        = EFI_SCSI_OP_SECURITY_PROTOCOL_OUT;
   Cdb[1]                        = SecurityProtocol;
-  WriteUnaligned16 ((UINT16 *)&Cdb[2], SwapBytes16 (SecurityProtocolSpecific));
+  WriteUnaligned16 (&Cdb[2], SwapBytes16 (SecurityProtocolSpecific));
 
   if (Inc512) {
     if (DataLength % 512 != 0) {
       return EFI_INVALID_PARAMETER;
     }
     Cdb[4]                      = BIT7;
-    WriteUnaligned32 ((UINT32 *)&Cdb[6], SwapBytes32 ((UINT32) DataLength / 512));
+    WriteUnaligned32 (&Cdb[6], SwapBytes32 ((UINT32) DataLength / 512));
   } else {
-    WriteUnaligned32 ((UINT32 *)&Cdb[6], SwapBytes32 ((UINT32) DataLength));
+    WriteUnaligned32 (&Cdb[6], SwapBytes32 ((UINT32) DataLength));
   }
 
   CommandPacket.CdbLength       = EFI_SCSI_OP_LENGTH_TWELVE;
@@ -1696,8 +1696,8 @@ ScsiRead10CommandEx (
   // Fill Cdb for Read (10) Command
   //
   Cdb[0]                          = EFI_SCSI_OP_READ10;
-  WriteUnaligned32 ((UINT32 *)&Cdb[2], SwapBytes32 (StartLba));
-  WriteUnaligned16 ((UINT16 *)&Cdb[7], SwapBytes16 ((UINT16) SectorSize));
+  WriteUnaligned32 (&Cdb[2], SwapBytes32 (StartLba));
+  WriteUnaligned16 (&Cdb[7], SwapBytes16 ((UINT16) SectorSize));
 
   CommandPacket->CdbLength        = EFI_SCSI_OP_LENGTH_TEN;
   CommandPacket->DataDirection    = EFI_SCSI_DATA_IN;
@@ -1880,8 +1880,8 @@ ScsiWrite10CommandEx (
   // Fill Cdb for Write (10) Command
   //
   Cdb[0]                           = EFI_SCSI_OP_WRITE10;
-  WriteUnaligned32 ((UINT32 *)&Cdb[2], SwapBytes32 (StartLba));
-  WriteUnaligned16 ((UINT16 *)&Cdb[7], SwapBytes16 ((UINT16) SectorSize));
+  WriteUnaligned32 (&Cdb[2], SwapBytes32 (StartLba));
+  WriteUnaligned16 (&Cdb[7], SwapBytes16 ((UINT16) SectorSize));
 
   CommandPacket->CdbLength         = EFI_SCSI_OP_LENGTH_TEN;
   CommandPacket->DataDirection     = EFI_SCSI_DATA_OUT;
@@ -2064,8 +2064,8 @@ ScsiRead16CommandEx (
   // Fill Cdb for Read (16) Command
   //
   Cdb[0]                          = EFI_SCSI_OP_READ16;
-  WriteUnaligned64 ((UINT64 *)&Cdb[2], SwapBytes64 (StartLba));
-  WriteUnaligned32 ((UINT32 *)&Cdb[10], SwapBytes32 (SectorSize));
+  WriteUnaligned64 (&Cdb[2], SwapBytes64 (StartLba));
+  WriteUnaligned32 (&Cdb[10], SwapBytes32 (SectorSize));
 
   CommandPacket->CdbLength        = EFI_SCSI_OP_LENGTH_SIXTEEN;
   CommandPacket->DataDirection    = EFI_SCSI_DATA_IN;
@@ -2248,8 +2248,8 @@ ScsiWrite16CommandEx (
   // Fill Cdb for Write (16) Command
   //
   Cdb[0]                           = EFI_SCSI_OP_WRITE16;
-  WriteUnaligned64 ((UINT64 *)&Cdb[2], SwapBytes64 (StartLba));
-  WriteUnaligned32 ((UINT32 *)&Cdb[10], SwapBytes32 (SectorSize));
+  WriteUnaligned64 (&Cdb[2], SwapBytes64 (StartLba));
+  WriteUnaligned32 (&Cdb[10], SwapBytes32 (SectorSize));
 
   CommandPacket->CdbLength         = EFI_SCSI_OP_LENGTH_SIXTEEN;
   CommandPacket->DataDirection     = EFI_SCSI_DATA_OUT;

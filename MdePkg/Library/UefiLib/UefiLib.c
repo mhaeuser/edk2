@@ -54,8 +54,8 @@ CompareIso639LanguageCode (
   UINT32  Name1;
   UINT32  Name2;
 
-  Name1 = ReadUnaligned24 ((CONST UINT32 *) Language1);
-  Name2 = ReadUnaligned24 ((CONST UINT32 *) Language2);
+  Name1 = ReadUnaligned24 (Language1);
+  Name2 = ReadUnaligned24 (Language2);
 
   return (BOOLEAN) (Name1 == Name2);
 }

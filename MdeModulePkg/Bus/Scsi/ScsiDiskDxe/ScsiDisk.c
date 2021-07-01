@@ -1550,7 +1550,7 @@ ScsiDiskUnmap (
   //
   Cdb    = CommandPacket->Cdb;
   Cdb[0] = EFI_SCSI_OP_UNMAP;
-  WriteUnaligned16 ((UINT16 *)&Cdb[7], SwapBytes16 (UnmapParamListLen));
+  WriteUnaligned16 (&Cdb[7], SwapBytes16 (UnmapParamListLen));
 
   if ((Token != NULL) && (Token->Event != NULL)) {
     //

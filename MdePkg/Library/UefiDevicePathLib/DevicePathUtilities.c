@@ -173,7 +173,7 @@ DevicePathNodeLength (
   )
 {
   ASSERT (Node != NULL);
-  return ReadUnaligned16 ((UINT16 *)&((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Length[0]);
+  return ReadUnaligned16 (&((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Length[0]);
 }
 
 /**
@@ -311,7 +311,7 @@ SetDevicePathNodeLength (
 {
   ASSERT (Node != NULL);
   ASSERT ((Length >= sizeof (EFI_DEVICE_PATH_PROTOCOL)) && (Length < SIZE_64KB));
-  return WriteUnaligned16 ((UINT16 *)&((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Length[0], (UINT16)(Length));
+  return WriteUnaligned16 (&((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Length[0], (UINT16)(Length));
 }
 
 /**

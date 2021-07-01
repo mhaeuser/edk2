@@ -233,7 +233,7 @@ Tpm2NvReadPublic (
     return EFI_DEVICE_ERROR;
   }
 
-  NvNameSize = SwapBytes16 (ReadUnaligned16 ((UINT16 *)((UINT8 *)&RecvBuffer + sizeof(TPM2_RESPONSE_HEADER) + sizeof(UINT16) + NvPublicSize)));
+  NvNameSize = SwapBytes16 (ReadUnaligned16 ((UINT8 *)&RecvBuffer + sizeof(TPM2_RESPONSE_HEADER) + sizeof(UINT16) + NvPublicSize));
   if (NvNameSize > sizeof(TPMU_NAME)){
     DEBUG ((DEBUG_ERROR, "Tpm2NvReadPublic - NvNameSize error %x\n", NvNameSize));
     return EFI_DEVICE_ERROR;
@@ -251,11 +251,11 @@ Tpm2NvReadPublic (
   NvPublic->size = NvPublicSize;
   NvPublic->nvPublic.nvIndex = SwapBytes32 (NvPublic->nvPublic.nvIndex);
   NvPublic->nvPublic.nameAlg = SwapBytes16 (NvPublic->nvPublic.nameAlg);
-  WriteUnaligned32 ((UINT32 *)&NvPublic->nvPublic.attributes, SwapBytes32 (ReadUnaligned32 ((UINT32 *)&NvPublic->nvPublic.attributes)));
+  WriteUnaligned32 (&NvPublic->nvPublic.attributes, SwapBytes32 (ReadUnaligned32 (&NvPublic->nvPublic.attributes)));
   NvPublic->nvPublic.authPolicy.size = SwapBytes16 (NvPublic->nvPublic.authPolicy.size);
   Buffer = (UINT8 *)&RecvBuffer.NvPublic.nvPublic.authPolicy;
   Buffer += sizeof(UINT16) + NvPublic->nvPublic.authPolicy.size;
-  NvPublic->nvPublic.dataSize = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
+  NvPublic->nvPublic.dataSize = SwapBytes16 (ReadUnaligned16 (Buffer));
 
   CopyMem (NvName->name, (UINT8 *)&RecvBuffer + sizeof(TPM2_RESPONSE_HEADER) + sizeof(UINT16) + NvPublicSize + sizeof(UINT16), NvNameSize);
   NvName->size = NvNameSize;
@@ -316,7 +316,7 @@ Tpm2NvDefineSpace (
   //
   // IndexAuth
   //
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(Auth->size));
+  WriteUnaligned16 (Buffer, SwapBytes16(Auth->size));
   Buffer += sizeof(UINT16);
   CopyMem(Buffer, Auth->buffer, Auth->size);
   Buffer += Auth->size;
@@ -326,19 +326,19 @@ Tpm2NvDefineSpace (
   //
   NvPublicSize = NvPublic->size;
 
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (NvPublicSize));
+  WriteUnaligned16 (Buffer, SwapBytes16 (NvPublicSize));
   Buffer += sizeof(UINT16);
-  WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32 (NvPublic->nvPublic.nvIndex));
+  WriteUnaligned32 (Buffer, SwapBytes32 (NvPublic->nvPublic.nvIndex));
   Buffer += sizeof(UINT32);
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (NvPublic->nvPublic.nameAlg));
+  WriteUnaligned16 (Buffer, SwapBytes16 (NvPublic->nvPublic.nameAlg));
   Buffer += sizeof(UINT16);
-  WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32 (ReadUnaligned32 ((UINT32 *)&NvPublic->nvPublic.attributes)));
+  WriteUnaligned32 (Buffer, SwapBytes32 (ReadUnaligned32 (&NvPublic->nvPublic.attributes)));
   Buffer += sizeof(UINT32);
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (NvPublic->nvPublic.authPolicy.size));
+  WriteUnaligned16 (Buffer, SwapBytes16 (NvPublic->nvPublic.authPolicy.size));
   Buffer += sizeof(UINT16);
   CopyMem (Buffer, NvPublic->nvPublic.authPolicy.buffer, NvPublic->nvPublic.authPolicy.size);
   Buffer += NvPublic->nvPublic.authPolicy.size;
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (NvPublic->nvPublic.dataSize));
+  WriteUnaligned16 (Buffer, SwapBytes16 (NvPublic->nvPublic.dataSize));
   Buffer += sizeof(UINT16);
 
   SendBufferSize = (UINT32)(Buffer - (UINT8 *)&SendBuffer);
@@ -559,9 +559,9 @@ Tpm2NvRead (
   Buffer += SessionInfoSize;
   SendBuffer.AuthSessionSize = SwapBytes32(SessionInfoSize);
 
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Size));
+  WriteUnaligned16 (Buffer, SwapBytes16 (Size));
   Buffer += sizeof(UINT16);
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Offset));
+  WriteUnaligned16 (Buffer, SwapBytes16 (Offset));
   Buffer += sizeof(UINT16);
 
   SendBufferSize = (UINT32)(Buffer - (UINT8 *)&SendBuffer);
@@ -703,11 +703,11 @@ Tpm2NvWrite (
   Buffer += SessionInfoSize;
   SendBuffer.AuthSessionSize = SwapBytes32(SessionInfoSize);
 
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (InData->size));
+  WriteUnaligned16 (Buffer, SwapBytes16 (InData->size));
   Buffer += sizeof(UINT16);
   CopyMem (Buffer, InData->buffer, InData->size);
   Buffer += InData->size;
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Offset));
+  WriteUnaligned16 (Buffer, SwapBytes16 (Offset));
   Buffer += sizeof(UINT16);
 
   SendBufferSize = (UINT32) (Buffer - (UINT8 *)&SendBuffer);

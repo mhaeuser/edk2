@@ -834,12 +834,12 @@ PxeBcDhcp6SeekOption (
   Cursor = Buf;
 
   while (Cursor < Buf + SeekLen) {
-    OpCode = ReadUnaligned16 ((UINT16 *) Cursor);
+    OpCode = ReadUnaligned16 (Cursor);
     if (OpCode == HTONS (OptType)) {
       Option = Cursor;
       break;
     }
-    DataLen = NTOHS (ReadUnaligned16 ((UINT16 *) (Cursor + 2)));
+    DataLen = NTOHS (ReadUnaligned16 (Cursor + 2));
     Cursor += (DataLen + 4);
   }
 
@@ -959,7 +959,7 @@ PxeBcRequestBootService (
              );
   if (Option != NULL) {
     CalcElapsedTime (Private);
-    WriteUnaligned16 ((UINT16*)(Option + 4), HTONS((UINT16) Private->ElapsedTime));
+    WriteUnaligned16 (Option + 4, HTONS((UINT16) Private->ElapsedTime));
   }
 
   Status = PxeBc->UdpWrite (

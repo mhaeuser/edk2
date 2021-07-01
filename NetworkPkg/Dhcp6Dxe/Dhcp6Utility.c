@@ -89,7 +89,7 @@ Dhcp6GenerateClientId (
     //
     // Set the Duid-type and copy UUID.
     //
-    WriteUnaligned16 ((UINT16 *) (Duid->Duid), HTONS (Dhcp6DuidTypeUuid));
+    WriteUnaligned16 (Duid->Duid, HTONS (Dhcp6DuidTypeUuid));
 
     CopyMem (Duid->Duid + 2, &Uuid, sizeof(EFI_GUID));
 
@@ -138,9 +138,9 @@ Dhcp6GenerateClientId (
     //
     // Set the Duid-type, hardware-type, time and copy the hardware address.
     //
-    WriteUnaligned16 ((UINT16 *) ((UINT8 *) Duid + OFFSET_OF (EFI_DHCP6_DUID, Duid)), HTONS (Dhcp6DuidTypeLlt));
-    WriteUnaligned16 ((UINT16 *) ((UINT8 *) Duid + OFFSET_OF (EFI_DHCP6_DUID, Duid) + 2), HTONS (NET_IFTYPE_ETHERNET));
-    WriteUnaligned32 ((UINT32 *) ((UINT8 *) Duid + OFFSET_OF (EFI_DHCP6_DUID, Duid) + 4), HTONL (Stamp));
+    WriteUnaligned16 (((UINT8 *) Duid + OFFSET_OF (EFI_DHCP6_DUID, Duid)), HTONS (Dhcp6DuidTypeLlt));
+    WriteUnaligned16 (((UINT8 *) Duid + OFFSET_OF (EFI_DHCP6_DUID, Duid) + 2), HTONS (NET_IFTYPE_ETHERNET));
+    WriteUnaligned32 (((UINT8 *) Duid + OFFSET_OF (EFI_DHCP6_DUID, Duid) + 4), HTONL (Stamp));
 
     CopyMem (Duid->Duid + 8, &Mode->CurrentAddress, Mode->HwAddressSize);
   }
@@ -633,9 +633,9 @@ Dhcp6AppendOption (
 
   ASSERT (OptLen != 0);
 
-  WriteUnaligned16 ((UINT16 *) Buf, OptType);
+  WriteUnaligned16 (Buf, OptType);
   Buf            += 2;
-  WriteUnaligned16 ((UINT16 *) Buf, OptLen);
+  WriteUnaligned16 (Buf, OptLen);
   Buf            += 2;
   CopyMem (Buf, Data, NTOHS (OptLen));
   Buf            += NTOHS (OptLen);
@@ -685,10 +685,10 @@ Dhcp6AppendIaAddrOption (
   //
   // Fill the value of Ia Address option type
   //
-  WriteUnaligned16 ((UINT16 *) Buf, HTONS (Dhcp6OptIaAddr));
+  WriteUnaligned16 (Buf, HTONS (Dhcp6OptIaAddr));
   Buf                     += 2;
 
-  WriteUnaligned16 ((UINT16 *) Buf, HTONS (sizeof (EFI_DHCP6_IA_ADDRESS)));
+  WriteUnaligned16 (Buf, HTONS (sizeof (EFI_DHCP6_IA_ADDRESS)));
   Buf                     += 2;
 
   CopyMem (Buf, &IaAddr->IpAddress, sizeof(EFI_IPv6_ADDRESS));
@@ -700,12 +700,12 @@ Dhcp6AppendIaAddrOption (
   // should set to 0 when initiate a Confirm message.
   //
   if (MessageType != Dhcp6MsgConfirm) {
-    WriteUnaligned32 ((UINT32 *) Buf, HTONL (IaAddr->PreferredLifetime));
+    WriteUnaligned32 (Buf, HTONL (IaAddr->PreferredLifetime));
   }
   Buf                     += 4;
 
   if (MessageType != Dhcp6MsgConfirm) {
-    WriteUnaligned32 ((UINT32 *) Buf, HTONL (IaAddr->ValidLifetime));
+    WriteUnaligned32 (Buf, HTONL (IaAddr->ValidLifetime));
   }
   Buf                     += 4;
 
@@ -760,7 +760,7 @@ Dhcp6AppendIaOption (
   //
   // Fill the value of Ia option type
   //
-  WriteUnaligned16 ((UINT16 *) Buf, HTONS (Ia->Descriptor.Type));
+  WriteUnaligned16 (Buf, HTONS (Ia->Descriptor.Type));
   Buf                     += 2;
 
   //
@@ -772,16 +772,16 @@ Dhcp6AppendIaOption (
   //
   // Fill the value of iaid
   //
-  WriteUnaligned32 ((UINT32 *) Buf, HTONL (Ia->Descriptor.IaId));
+  WriteUnaligned32 (Buf, HTONL (Ia->Descriptor.IaId));
   Buf                     += 4;
 
   //
   // Fill the value of t1 and t2 if iana, keep it 0xffffffff if no specified.
   //
   if (Ia->Descriptor.Type == Dhcp6OptIana) {
-    WriteUnaligned32 ((UINT32 *) Buf, HTONL ((T1 != 0) ? T1 : 0xffffffff));
+    WriteUnaligned32 (Buf, HTONL ((T1 != 0) ? T1 : 0xffffffff));
     Buf                   += 4;
-    WriteUnaligned32 ((UINT32 *) Buf, HTONL ((T2 != 0) ? T2 : 0xffffffff));
+    WriteUnaligned32 (Buf, HTONL ((T2 != 0) ? T2 : 0xffffffff));
     Buf                   += 4;
   }
 
@@ -833,20 +833,20 @@ Dhcp6AppendETOption (
   //
   // Fill the value of elapsed-time option type.
   //
-  WriteUnaligned16 ((UINT16 *) Buf, HTONS (Dhcp6OptElapsedTime));
+  WriteUnaligned16 (Buf, HTONS (Dhcp6OptElapsedTime));
   Buf                     += 2;
 
   //
   // Fill the len of elapsed-time option, which is fixed.
   //
-  WriteUnaligned16 ((UINT16 *) Buf, HTONS(2));
+  WriteUnaligned16 (Buf, HTONS(2));
   Buf                     += 2;
 
   //
   // Fill in elapsed time value with 0 value for now.  The actual value is
   // filled in later just before the packet is transmitted.
   //
-  WriteUnaligned16 ((UINT16 *) Buf, HTONS(0));
+  WriteUnaligned16 (Buf, HTONS(0));
   *Elapsed                  = (UINT16 *) Buf;
   Buf                     += 2;
 
@@ -936,12 +936,12 @@ Dhcp6SeekOption (
   // The format of Dhcp6 option refers to Dhcp6AppendOption().
   //
   while (Cursor < Buf + SeekLen) {
-    OpCode = ReadUnaligned16 ((UINT16 *) Cursor);
+    OpCode = ReadUnaligned16 (Cursor);
     if (OpCode == HTONS (OptType)) {
       Option = Cursor;
       break;
     }
-    DataLen = NTOHS (ReadUnaligned16 ((UINT16 *) (Cursor + 2)));
+    DataLen = NTOHS (ReadUnaligned16 (Cursor + 2));
     Cursor += (DataLen + 4);
   }
 
@@ -980,13 +980,13 @@ Dhcp6SeekIaOption (
   Cursor = Buf;
 
   while (Cursor < Buf + SeekLen) {
-    OpCode = ReadUnaligned16 ((UINT16 *) Cursor);
-    IaId   = ReadUnaligned32 ((UINT32 *) (Cursor + 4));
+    OpCode = ReadUnaligned16 (Cursor);
+    IaId   = ReadUnaligned32 (Cursor + 4);
     if (OpCode == HTONS (IaDesc->Type) && IaId == HTONL (IaDesc->IaId)) {
       Option = Cursor;
       break;
     }
-    DataLen = NTOHS (ReadUnaligned16 ((UINT16 *) (Cursor + 2)));
+    DataLen = NTOHS (ReadUnaligned16 (Cursor + 2));
     Cursor += (DataLen + 4);
   }
 
@@ -1086,9 +1086,9 @@ Dhcp6ParseAddrOption (
     // Refer to RFC3315 Chapter 18.1.8, we need to update lifetimes for any addresses in the IA option
     // that the client already has recorded in the IA, and discard the Ia address option with 0 valid time.
     //
-    OpCode  = ReadUnaligned16 ((UINT16 *) Cursor);
-    PreferredLt = NTOHL (ReadUnaligned32 ((UINT32 *) (Cursor + 20)));
-    ValidLt = NTOHL (ReadUnaligned32 ((UINT32 *) (Cursor + 24)));
+    OpCode  = ReadUnaligned16 (Cursor);
+    PreferredLt = NTOHL (ReadUnaligned32 (Cursor + 20));
+    ValidLt = NTOHL (ReadUnaligned32 (Cursor + 24));
     IaAddr = (EFI_DHCP6_IA_ADDRESS *) (Cursor + 4);
     if (OpCode == HTONS (Dhcp6OptIaAddr) && ValidLt >= PreferredLt &&
         (Dhcp6AddrIsInCurrentIa(IaAddr, CurrentIa) || ValidLt !=0)) {
@@ -1100,7 +1100,7 @@ Dhcp6ParseAddrOption (
       }
       (*AddrNum)++;
     }
-    DataLen = NTOHS (ReadUnaligned16 ((UINT16 *) (Cursor + 2)));
+    DataLen = NTOHS (ReadUnaligned16 (Cursor + 2));
     Cursor += (DataLen + 4);
   }
 }

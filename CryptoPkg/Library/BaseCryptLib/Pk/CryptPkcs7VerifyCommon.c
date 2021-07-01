@@ -350,7 +350,7 @@ Pkcs7GetSigners (
       OldBuf = NULL;
     }
 
-    WriteUnaligned32 ((UINT32 *) (CertBuf + OldSize), (UINT32) SingleCertSize);
+    WriteUnaligned32 (CertBuf + OldSize, (UINT32) SingleCertSize);
     CopyMem (CertBuf + OldSize + sizeof (UINT32), SingleCert, SingleCertSize);
 
     free (SingleCert);
@@ -635,7 +635,7 @@ Pkcs7GetCertificatesList (
         OldBuf = NULL;
       }
 
-      WriteUnaligned32 ((UINT32 *) (CertBuf + OldSize), (UINT32) CertSize);
+      WriteUnaligned32 (CertBuf + OldSize, (UINT32) CertSize);
       CopyMem (CertBuf + OldSize + sizeof (UINT32), SingleCert, CertSize);
 
       free (SingleCert);
@@ -678,7 +678,7 @@ Pkcs7GetCertificatesList (
         OldBuf = NULL;
       }
 
-      WriteUnaligned32 ((UINT32 *) (CertBuf + OldSize), (UINT32) CertSize);
+      WriteUnaligned32 (CertBuf + OldSize, (UINT32) CertSize);
       CopyMem (CertBuf + OldSize + sizeof (UINT32), SingleCert, CertSize);
 
       free (SingleCert);

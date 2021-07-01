@@ -2065,7 +2065,7 @@ RegisterFontPackage (
   Package = AllocateZeroPool (PackageLength);
   ASSERT (Package != NULL);
 
-  WriteUnaligned32((UINT32 *) Package,PackageLength);
+  WriteUnaligned32(Package,PackageLength);
   SimplifiedFont = (EFI_HII_SIMPLE_FONT_PACKAGE_HDR *) (Package + 4);
   SimplifiedFont->Header.Length        = (UINT32) (PackageLength - 4);
   SimplifiedFont->Header.Type          = EFI_HII_PACKAGE_SIMPLE_FONTS;

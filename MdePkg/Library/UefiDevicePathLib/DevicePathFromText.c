@@ -631,7 +631,7 @@ DevPathFromTextBmc (
 
   BmcDp->InterfaceType = (UINT8) Strtoi (InterfaceTypeStr);
   WriteUnaligned64 (
-    (UINT64 *) (&BmcDp->BaseAddress),
+    &BmcDp->BaseAddress,
     StrHexToUint64 (BaseAddressStr)
     );
 
@@ -1568,8 +1568,8 @@ DevPathFromTextSasEx (
 
   Strtoi64 (AddressStr, &SasAddress);
   Strtoi64 (LunStr,     &Lun);
-  WriteUnaligned64 ((UINT64 *) &SasEx->SasAddress, SwapBytes64 (SasAddress));
-  WriteUnaligned64 ((UINT64 *) &SasEx->Lun,        SwapBytes64 (Lun));
+  WriteUnaligned64 (&SasEx->SasAddress, SwapBytes64 (SasAddress));
+  WriteUnaligned64 (&SasEx->Lun,        SwapBytes64 (Lun));
   SasEx->RelativeTargetPort      = (UINT16) Strtoi (RTPStr);
 
   if (StrCmp (SASSATAStr, L"NoTopology") == 0) {
@@ -2585,7 +2585,7 @@ DevPathFromTextiSCSI (
 
   ISCSIDevPath->TargetPortalGroupTag = (UINT16) Strtoi (PortalGroupStr);
   Strtoi64 (LunStr, &Lun);
-  WriteUnaligned64 ((UINT64 *) &ISCSIDevPath->Lun, SwapBytes64 (Lun));
+  WriteUnaligned64 (&ISCSIDevPath->Lun, SwapBytes64 (Lun));
 
   Options = 0x0000;
   if (StrCmp (HeaderDigestStr, L"CRC32C") == 0) {
@@ -3174,9 +3174,9 @@ DevPathFromTextRamDisk (
                                                      );
 
   Strtoi64 (StartingAddrStr, &StartingAddr);
-  WriteUnaligned64 ((UINT64 *) &(RamDisk->StartingAddr[0]), StartingAddr);
+  WriteUnaligned64 (&(RamDisk->StartingAddr[0]), StartingAddr);
   Strtoi64 (EndingAddrStr, &EndingAddr);
-  WriteUnaligned64 ((UINT64 *) &(RamDisk->EndingAddr[0]), EndingAddr);
+  WriteUnaligned64 (&(RamDisk->EndingAddr[0]), EndingAddr);
   RamDisk->Instance = (UINT16) Strtoi (InstanceStr);
   StrToGuid (TypeGuidStr, &RamDisk->TypeGuid);
 
@@ -3214,9 +3214,9 @@ DevPathFromTextVirtualDisk (
                                                      );
 
   Strtoi64 (StartingAddrStr, &StartingAddr);
-  WriteUnaligned64 ((UINT64 *) &(RamDisk->StartingAddr[0]), StartingAddr);
+  WriteUnaligned64 (&(RamDisk->StartingAddr[0]), StartingAddr);
   Strtoi64 (EndingAddrStr, &EndingAddr);
-  WriteUnaligned64 ((UINT64 *) &(RamDisk->EndingAddr[0]), EndingAddr);
+  WriteUnaligned64 (&(RamDisk->EndingAddr[0]), EndingAddr);
   RamDisk->Instance = (UINT16) Strtoi (InstanceStr);
   CopyGuid (&RamDisk->TypeGuid, &gEfiVirtualDiskGuid);
 
@@ -3254,9 +3254,9 @@ DevPathFromTextVirtualCd (
                                                      );
 
   Strtoi64 (StartingAddrStr, &StartingAddr);
-  WriteUnaligned64 ((UINT64 *) &(RamDisk->StartingAddr[0]), StartingAddr);
+  WriteUnaligned64 (&(RamDisk->StartingAddr[0]), StartingAddr);
   Strtoi64 (EndingAddrStr, &EndingAddr);
-  WriteUnaligned64 ((UINT64 *) &(RamDisk->EndingAddr[0]), EndingAddr);
+  WriteUnaligned64 (&(RamDisk->EndingAddr[0]), EndingAddr);
   RamDisk->Instance = (UINT16) Strtoi (InstanceStr);
   CopyGuid (&RamDisk->TypeGuid, &gEfiVirtualCdGuid);
 
@@ -3294,9 +3294,9 @@ DevPathFromTextPersistentVirtualDisk (
                                                      );
 
   Strtoi64 (StartingAddrStr, &StartingAddr);
-  WriteUnaligned64 ((UINT64 *) &(RamDisk->StartingAddr[0]), StartingAddr);
+  WriteUnaligned64 (&(RamDisk->StartingAddr[0]), StartingAddr);
   Strtoi64 (EndingAddrStr, &EndingAddr);
-  WriteUnaligned64 ((UINT64 *) &(RamDisk->EndingAddr[0]), EndingAddr);
+  WriteUnaligned64 (&(RamDisk->EndingAddr[0]), EndingAddr);
   RamDisk->Instance = (UINT16) Strtoi (InstanceStr);
   CopyGuid (&RamDisk->TypeGuid, &gEfiPersistentVirtualDiskGuid);
 
@@ -3334,9 +3334,9 @@ DevPathFromTextPersistentVirtualCd (
                                                      );
 
   Strtoi64 (StartingAddrStr, &StartingAddr);
-  WriteUnaligned64 ((UINT64 *) &(RamDisk->StartingAddr[0]), StartingAddr);
+  WriteUnaligned64 (&(RamDisk->StartingAddr[0]), StartingAddr);
   Strtoi64 (EndingAddrStr, &EndingAddr);
-  WriteUnaligned64 ((UINT64 *) &(RamDisk->EndingAddr[0]), EndingAddr);
+  WriteUnaligned64 (&(RamDisk->EndingAddr[0]), EndingAddr);
   RamDisk->Instance = (UINT16) Strtoi (InstanceStr);
   CopyGuid (&RamDisk->TypeGuid, &gEfiPersistentVirtualCdGuid);
 

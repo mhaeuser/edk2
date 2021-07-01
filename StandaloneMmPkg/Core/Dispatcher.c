@@ -250,7 +250,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
       // assigned by tools, the PointerToRelocations & PointerToLineNumbers fields should not be
       // Zero, or else, these 2 fields should be set to Zero
       //
-      ValueInSectionHeader = ReadUnaligned64 ((UINT64*)&SectionHeader.PointerToRelocations);
+      ValueInSectionHeader = ReadUnaligned64 (&SectionHeader.PointerToRelocations);
       if (ValueInSectionHeader != 0) {
         //
         // Found first section header that doesn't point to code section in which build tool saves the

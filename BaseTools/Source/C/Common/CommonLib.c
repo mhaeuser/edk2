@@ -1181,12 +1181,12 @@ CopyGuid (
   )
 {
   WriteUnaligned64 (
-    (UINT64*)DestinationGuid,
-    ReadUnaligned64 ((CONST UINT64*)SourceGuid)
+    DestinationGuid,
+    ReadUnaligned64 (SourceGuid)
     );
   WriteUnaligned64 (
-    (UINT64*)DestinationGuid + 1,
-    ReadUnaligned64 ((CONST UINT64*)SourceGuid + 1)
+    (UINT8*)DestinationGuid + sizeof (UINT64),
+    ReadUnaligned64 ((CONST UINT8*)SourceGuid + sizeof (UINT64))
     );
   return DestinationGuid;
 }

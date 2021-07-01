@@ -700,13 +700,13 @@ UefiDecompressGetInfo (
     return RETURN_INVALID_PARAMETER;
   }
 
-  CompressedSize   = ReadUnaligned32 ((UINT32 *)Source);
+  CompressedSize   = ReadUnaligned32 (Source);
   if (SourceSize < (CompressedSize + 8) || (CompressedSize + 8) < 8) {
     return RETURN_INVALID_PARAMETER;
   }
 
   *ScratchSize  = sizeof (SCRATCH_DATA);
-  *DestinationSize = ReadUnaligned32 ((UINT32 *)Source + 1);
+  *DestinationSize = ReadUnaligned32 ((UINT8 *)Source + sizeof (UINT32));
 
   return RETURN_SUCCESS;
 }

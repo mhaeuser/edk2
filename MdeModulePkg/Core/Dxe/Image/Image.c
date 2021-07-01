@@ -466,7 +466,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
        // assumption that when the feature is enabled, if a module is assigned a loading address by tools, PointerToRelocations
        // & PointerToLineNumbers fields should NOT be Zero, or else, these 2 fields should be set to Zero
        //
-       ValueInSectionHeader = ReadUnaligned64((UINT64*)&SectionHeader.PointerToRelocations);
+       ValueInSectionHeader = ReadUnaligned64(&SectionHeader.PointerToRelocations);
        if (ValueInSectionHeader != 0) {
          //
          // When the feature is configured as load module at fixed absolute address, the ImageAddress field of ImageContext

@@ -93,7 +93,7 @@ ReadUnaligned24 (
   ASSERT (Buffer != NULL);
 
   return (UINT32)(
-            ReadUnaligned16 ((UINT16*)Buffer) |
+            ReadUnaligned16 (Buffer) |
             (((UINT8*)Buffer)[2] << 16)
             );
 }
@@ -122,7 +122,7 @@ WriteUnaligned24 (
 {
   ASSERT (Buffer != NULL);
 
-  WriteUnaligned16 ((UINT16*)Buffer, (UINT16)Value);
+  WriteUnaligned16 (Buffer, (UINT16)Value);
   *(UINT8*)((UINT16*)Buffer + 1) = (UINT8)(Value >> 16);
   return Value;
 }
@@ -151,8 +151,8 @@ ReadUnaligned32 (
 
   ASSERT (Buffer != NULL);
 
-  LowerBytes  = ReadUnaligned16 ((UINT16*) Buffer);
-  HigherBytes = ReadUnaligned16 ((UINT16*) Buffer + 1);
+  LowerBytes  = ReadUnaligned16 (Buffer);
+  HigherBytes = ReadUnaligned16 ((UINT8*) Buffer + sizeof (UINT16));
 
   return (UINT32) (LowerBytes | (HigherBytes << 16));
 }
@@ -181,8 +181,8 @@ WriteUnaligned32 (
 {
   ASSERT (Buffer != NULL);
 
-  WriteUnaligned16 ((UINT16*)Buffer, (UINT16)Value);
-  WriteUnaligned16 ((UINT16*)Buffer + 1, (UINT16)(Value >> 16));
+  WriteUnaligned16 (Buffer, (UINT16)Value);
+  WriteUnaligned16 ((UINT8*)Buffer + sizeof (UINT16), (UINT16)(Value >> 16));
   return Value;
 }
 
@@ -210,8 +210,8 @@ ReadUnaligned64 (
 
   ASSERT (Buffer != NULL);
 
-  LowerBytes  = ReadUnaligned32 ((UINT32*) Buffer);
-  HigherBytes = ReadUnaligned32 ((UINT32*) Buffer + 1);
+  LowerBytes  = ReadUnaligned32 (Buffer);
+  HigherBytes = ReadUnaligned32 ((UINT8*) Buffer + sizeof (UINT32));
 
   return (UINT64) (LowerBytes | LShiftU64 (HigherBytes, 32));
 }
@@ -240,7 +240,7 @@ WriteUnaligned64 (
 {
   ASSERT (Buffer != NULL);
 
-  WriteUnaligned32 ((UINT32*)Buffer, (UINT32)Value);
-  WriteUnaligned32 ((UINT32*)Buffer + 1, (UINT32)RShiftU64 (Value, 32));
+  WriteUnaligned32 (Buffer, (UINT32)Value);
+  WriteUnaligned32 ((UINT8*)Buffer + sizeof (UINT32), (UINT32)RShiftU64 (Value, 32));
   return Value;
 }

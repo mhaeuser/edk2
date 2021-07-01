@@ -173,11 +173,11 @@ Tpm2DictionaryAttackParameters (
   //
   // Real data
   //
-  WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32(NewMaxTries));
+  WriteUnaligned32 (Buffer, SwapBytes32(NewMaxTries));
   Buffer += sizeof(UINT32);
-  WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32(NewRecoveryTime));
+  WriteUnaligned32 (Buffer, SwapBytes32(NewRecoveryTime));
   Buffer += sizeof(UINT32);
-  WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32(LockoutRecovery));
+  WriteUnaligned32 (Buffer, SwapBytes32(LockoutRecovery));
   Buffer += sizeof(UINT32);
 
   SendBufferSize = (UINT32)((UINTN)Buffer - (UINTN)&SendBuffer);

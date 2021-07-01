@@ -696,8 +696,8 @@ GetImageExeInfoTableSize (
   ImageExeInfoItem  = (EFI_IMAGE_EXECUTION_INFO *) ((UINT8 *) ImageExeInfoTable + sizeof (EFI_IMAGE_EXECUTION_INFO_TABLE));
   TotalSize         = sizeof (EFI_IMAGE_EXECUTION_INFO_TABLE);
   for (Index = 0; Index < ImageExeInfoTable->NumberOfImages; Index++) {
-    TotalSize += ReadUnaligned32 ((UINT32 *) &ImageExeInfoItem->InfoSize);
-    ImageExeInfoItem = (EFI_IMAGE_EXECUTION_INFO *) ((UINT8 *) ImageExeInfoItem + ReadUnaligned32 ((UINT32 *) &ImageExeInfoItem->InfoSize));
+    TotalSize += ReadUnaligned32 (&ImageExeInfoItem->InfoSize);
+    ImageExeInfoItem = (EFI_IMAGE_EXECUTION_INFO *) ((UINT8 *) ImageExeInfoItem + ReadUnaligned32 (&ImageExeInfoItem->InfoSize));
   }
 
   return TotalSize;
@@ -785,8 +785,8 @@ AddImageExeInfo (
   //
   // Update new item's information.
   //
-  WriteUnaligned32 ((UINT32 *) ImageExeInfoEntry, Action);
-  WriteUnaligned32 ((UINT32 *) ((UINT8 *) ImageExeInfoEntry + sizeof (EFI_IMAGE_EXECUTION_ACTION)), (UINT32) NewImageExeInfoEntrySize);
+  WriteUnaligned32 (ImageExeInfoEntry, Action);
+  WriteUnaligned32 (((UINT8 *) ImageExeInfoEntry + sizeof (EFI_IMAGE_EXECUTION_ACTION)), (UINT32) NewImageExeInfoEntrySize);
 
   NameStr = (CHAR16 *)(ImageExeInfoEntry + 1);
   if (Name != NULL) {
@@ -1361,7 +1361,7 @@ IsForbiddenByDbx (
   CertNumber = (UINT8) (*CertBuffer);
   CertPtr    = CertBuffer + 1;
   for (Index = 0; Index < CertNumber; Index++) {
-    CertSize = (UINTN) ReadUnaligned32 ((UINT32 *)CertPtr);
+    CertSize = (UINTN) ReadUnaligned32 (CertPtr);
     Cert     = (UINT8 *)CertPtr + sizeof (UINT32);
     //
     // Advance CertPtr to the next cert in image signer's cert list

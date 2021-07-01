@@ -51,7 +51,7 @@ ReadNvmeControllerCapabilities (
     return Status;
   }
 
-  WriteUnaligned64 ((UINT64*)Cap, Data);
+  WriteUnaligned64 (Cap, Data);
   return EFI_SUCCESS;
 }
 
@@ -89,7 +89,7 @@ ReadNvmeControllerConfiguration (
     return Status;
   }
 
-  WriteUnaligned32 ((UINT32*)Cc, Data);
+  WriteUnaligned32 (Cc, Data);
   return EFI_SUCCESS;
 }
 
@@ -114,7 +114,7 @@ WriteNvmeControllerConfiguration (
   UINT32                Data;
 
   PciIo  = Private->PciIo;
-  Data   = ReadUnaligned32 ((UINT32*)Cc);
+  Data   = ReadUnaligned32 (Cc);
   Status = PciIo->Mem.Write (
                         PciIo,
                         EfiPciIoWidthUint32,
@@ -173,7 +173,7 @@ ReadNvmeControllerStatus (
     return Status;
   }
 
-  WriteUnaligned32 ((UINT32*)Csts, Data);
+  WriteUnaligned32 (Csts, Data);
   return EFI_SUCCESS;
 }
 
@@ -200,7 +200,7 @@ WriteNvmeAdminQueueAttributes (
   UINT32                Data;
 
   PciIo  = Private->PciIo;
-  Data   = ReadUnaligned32 ((UINT32*)Aqa);
+  Data   = ReadUnaligned32 (Aqa);
   Status = PciIo->Mem.Write (
                         PciIo,
                         EfiPciIoWidthUint32,
@@ -242,7 +242,7 @@ WriteNvmeAdminSubmissionQueueBaseAddress (
   UINT64                Data;
 
   PciIo  = Private->PciIo;
-  Data   = ReadUnaligned64 ((UINT64*)Asq);
+  Data   = ReadUnaligned64 (Asq);
 
   Status = PciIo->Mem.Write (
                         PciIo,
@@ -285,7 +285,7 @@ WriteNvmeAdminCompletionQueueBaseAddress (
   UINT64                Data;
 
   PciIo  = Private->PciIo;
-  Data   = ReadUnaligned64 ((UINT64*)Acq);
+  Data   = ReadUnaligned64 (Acq);
 
   Status = PciIo->Mem.Write (
                         PciIo,

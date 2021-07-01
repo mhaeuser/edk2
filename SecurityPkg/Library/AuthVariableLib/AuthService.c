@@ -1207,7 +1207,7 @@ FindCertsFromDb (
     return EFI_INVALID_PARAMETER;
   }
 
-  CertDbListSize = ReadUnaligned32 ((UINT32 *) Data);
+  CertDbListSize = ReadUnaligned32 (Data);
 
   if (CertDbListSize != (UINT32) DataSize) {
     return EFI_INVALID_PARAMETER;
@@ -2114,7 +2114,7 @@ VerifyTimeBasedPayload (
         CertDataPtr = (EFI_CERT_DATA *)(SignerCerts + 1);
         Status = CalculatePrivAuthVarSignChainSHA256Digest(
                    CertDataPtr->CertDataBuffer,
-                   ReadUnaligned32 ((UINT32 *)&(CertDataPtr->CertDataLength)),
+                   ReadUnaligned32 (&(CertDataPtr->CertDataLength)),
                    TopLevelCert,
                    TopLevelCertSize,
                    Sha256Digest
@@ -2155,7 +2155,7 @@ VerifyTimeBasedPayload (
                  VendorGuid,
                  Attributes,
                  CertDataPtr->CertDataBuffer,
-                 ReadUnaligned32 ((UINT32 *)&(CertDataPtr->CertDataLength)),
+                 ReadUnaligned32 (&(CertDataPtr->CertDataLength)),
                  TopLevelCert,
                  TopLevelCertSize
                  );

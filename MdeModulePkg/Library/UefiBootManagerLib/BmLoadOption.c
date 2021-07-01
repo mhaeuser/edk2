@@ -215,10 +215,10 @@ structure.
   ASSERT (Variable != NULL);
 
   Ptr             = Variable;
-  WriteUnaligned32 ((UINT32 *) Ptr, Option->Attributes);
+  WriteUnaligned32 (Ptr, Option->Attributes);
   Ptr            += sizeof (Option->Attributes);
 
-  WriteUnaligned16 ((UINT16 *) Ptr, (UINT16) GetDevicePathSize (Option->FilePath));
+  WriteUnaligned16 (Ptr, (UINT16) GetDevicePathSize (Option->FilePath));
   Ptr            += sizeof (UINT16);
 
   CopyMem (Ptr, Description, StrSize (Description));
@@ -735,7 +735,7 @@ BmValidateOption (
   //
   // Get the option's device path size
   //
-  FilePathSize = ReadUnaligned16 ((UINT16 *) Variable);
+  FilePathSize = ReadUnaligned16 (Variable);
   Variable += sizeof (UINT16);
 
   //
@@ -903,13 +903,13 @@ EfiBootManagerVariableToLoadOptionEx (
   // Get the option attribute
   //
   VariablePtr = Variable;
-  Attribute = ReadUnaligned32 ((UINT32 *) VariablePtr);
+  Attribute = ReadUnaligned32 (VariablePtr);
   VariablePtr += sizeof (UINT32);
 
   //
   // Get the option's device path size
   //
-  FilePathSize = ReadUnaligned16 ((UINT16 *) VariablePtr);
+  FilePathSize = ReadUnaligned16 (VariablePtr);
   VariablePtr += sizeof (UINT16);
 
   //

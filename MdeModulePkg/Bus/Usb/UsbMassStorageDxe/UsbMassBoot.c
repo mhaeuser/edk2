@@ -455,9 +455,9 @@ UsbBootReadCapacity16 (
   // from READ CAPACITY data.
   //
   Media->MediaPresent = TRUE;
-  Media->LastBlock    = SwapBytes64 (ReadUnaligned64 ((CONST UINT64 *) &(CapacityData.LastLba7)));
+  Media->LastBlock    = SwapBytes64 (ReadUnaligned64 (&(CapacityData.LastLba7)));
 
-  BlockSize           = SwapBytes32 (ReadUnaligned32 ((CONST UINT32 *) &(CapacityData.BlockSize3)));
+  BlockSize           = SwapBytes32 (ReadUnaligned32 (&(CapacityData.BlockSize3)));
 
   Media->LowestAlignedLba = (CapacityData.LowestAlignLogic2 << 8) |
                              CapacityData.LowestAlignLogic1;
@@ -527,9 +527,9 @@ UsbBootReadCapacity (
   // from READ CAPACITY data.
   //
   Media->MediaPresent = TRUE;
-  Media->LastBlock    = SwapBytes32 (ReadUnaligned32 ((CONST UINT32 *) CapacityData.LastLba));
+  Media->LastBlock    = SwapBytes32 (ReadUnaligned32 (CapacityData.LastLba));
 
-  BlockSize           = SwapBytes32 (ReadUnaligned32 ((CONST UINT32 *) CapacityData.BlockLen));
+  BlockSize           = SwapBytes32 (ReadUnaligned32 (CapacityData.BlockLen));
   if (BlockSize == 0) {
     //
     //  Get sense data
@@ -848,8 +848,8 @@ UsbBootReadWriteBlocks (
 
     Cmd.OpCode  = Write ? USB_BOOT_WRITE10_OPCODE : USB_BOOT_READ10_OPCODE;
     Cmd.Lun     = (UINT8) (USB_BOOT_LUN (UsbMass->Lun));
-    WriteUnaligned32 ((UINT32 *) Cmd.Lba, SwapBytes32 (Lba));
-    WriteUnaligned16 ((UINT16 *) Cmd.TransferLen, SwapBytes16 ((UINT16)Count));
+    WriteUnaligned32 (Cmd.Lba, SwapBytes32 (Lba));
+    WriteUnaligned16 (Cmd.TransferLen, SwapBytes16 ((UINT16)Count));
 
     Status = UsbBootExecCmdWithRetry (
                UsbMass,
@@ -928,8 +928,8 @@ UsbBootReadWriteBlocks16 (
 
     Cmd[0]  = Write ? EFI_SCSI_OP_WRITE16 : EFI_SCSI_OP_READ16;
     Cmd[1]  = (UINT8) ((USB_BOOT_LUN (UsbMass->Lun) & 0xE0));
-    WriteUnaligned64 ((UINT64 *) &Cmd[2], SwapBytes64 (Lba));
-    WriteUnaligned32 ((UINT32 *) &Cmd[10], SwapBytes32 (Count));
+    WriteUnaligned64 (&Cmd[2], SwapBytes64 (Lba));
+    WriteUnaligned32 (&Cmd[10], SwapBytes32 (Count));
 
     Status = UsbBootExecCmdWithRetry (
                UsbMass,

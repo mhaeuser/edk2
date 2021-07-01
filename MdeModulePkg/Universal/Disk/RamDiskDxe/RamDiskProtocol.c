@@ -44,11 +44,11 @@ RamDiskInitDeviceNode (
   )
 {
   WriteUnaligned64 (
-    (UINT64 *) &(RamDiskDevNode->StartingAddr[0]),
+    &(RamDiskDevNode->StartingAddr[0]),
     (UINT64) PrivateData->StartingAddr
     );
   WriteUnaligned64 (
-    (UINT64 *) &(RamDiskDevNode->EndingAddr[0]),
+    &(RamDiskDevNode->EndingAddr[0]),
     (UINT64) PrivateData->StartingAddr + PrivateData->Size - 1
     );
   CopyGuid (&RamDiskDevNode->TypeGuid, &PrivateData->TypeGuid);
@@ -794,8 +794,8 @@ RamDiskUnregister (
   }
 
   Found          = FALSE;
-  StartingAddr   = ReadUnaligned64 ((UINT64 *) &(RamDiskDevNode->StartingAddr[0]));
-  EndingAddr     = ReadUnaligned64 ((UINT64 *) &(RamDiskDevNode->EndingAddr[0]));
+  StartingAddr   = ReadUnaligned64 (&(RamDiskDevNode->StartingAddr[0]));
+  EndingAddr     = ReadUnaligned64 (&(RamDiskDevNode->EndingAddr[0]));
 
   if (!IsListEmpty(&RegisteredRamDisks)) {
     BASE_LIST_FOR_EACH_SAFE (Entry, NextEntry, &RegisteredRamDisks) {

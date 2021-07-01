@@ -552,7 +552,7 @@ NvmePassThruExecute (
   if (Private->SqTdbl[QueueId].Sqt == SqSize) {
     Private->SqTdbl[QueueId].Sqt = 0;
   }
-  Data32 = ReadUnaligned32 ((UINT32 *)&Private->SqTdbl[QueueId]);
+  Data32 = ReadUnaligned32 (&Private->SqTdbl[QueueId]);
   Status = NVME_SET_SQTDBL (Private, QueueId, &Data32);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: NVME_SET_SQTDBL fail, Status - %r\n", __FUNCTION__, Status));

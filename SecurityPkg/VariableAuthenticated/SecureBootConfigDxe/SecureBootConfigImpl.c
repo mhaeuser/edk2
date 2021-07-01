@@ -1426,11 +1426,11 @@ EnrollX509HashtoSigDB (
     }
 
     SignatureList     = (EFI_SIGNATURE_LIST *)(Data + Offset);
-    SignatureListSize = (UINTN) ReadUnaligned32 ((UINT32 *)&SignatureList->SignatureListSize);
+    SignatureListSize = (UINTN) ReadUnaligned32 (&SignatureList->SignatureListSize);
     CopyMem (NewData, Data, Offset + SignatureListSize);
 
     SignatureList = (EFI_SIGNATURE_LIST *)(NewData + Offset);
-    WriteUnaligned32 ((UINT32 *) &SignatureList->SignatureListSize, (UINT32)(SignatureListSize + SignatureSize));
+    WriteUnaligned32 (&SignatureList->SignatureListSize, (UINT32)(SignatureListSize + SignatureSize));
 
     Offset += SignatureListSize;
     CopyMem (NewData + Offset, SignatureData, SignatureSize);
@@ -1454,8 +1454,8 @@ EnrollX509HashtoSigDB (
     //
     SignatureList     = (EFI_SIGNATURE_LIST*) (NewData + DataSize);
     SignatureListSize = sizeof(EFI_SIGNATURE_LIST) + SignatureSize;
-    WriteUnaligned32 ((UINT32 *) &SignatureList->SignatureListSize, (UINT32) SignatureListSize);
-    WriteUnaligned32 ((UINT32 *) &SignatureList->SignatureSize, (UINT32) SignatureSize);
+    WriteUnaligned32 (&SignatureList->SignatureListSize, (UINT32) SignatureListSize);
+    WriteUnaligned32 (&SignatureList->SignatureSize, (UINT32) SignatureSize);
     CopyGuid (&SignatureList->SignatureType, &SignatureType);
     CopyMem ((UINT8* ) SignatureList + sizeof (EFI_SIGNATURE_LIST), SignatureData, SignatureSize);
     if ((DataSize != 0) && (Data != NULL)) {

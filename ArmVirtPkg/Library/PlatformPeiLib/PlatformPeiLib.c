@@ -123,7 +123,7 @@ PlatformPeim (
         if (Len == 8) {
           TpmBase = fdt32_to_cpu (RegProp[0]);
         } else if (Len == 16) {
-          TpmBase = fdt64_to_cpu (ReadUnaligned64 ((UINT64 *)RegProp));
+          TpmBase = fdt64_to_cpu (ReadUnaligned64 (RegProp));
         }
 
         if (Depth > 1) {
@@ -154,14 +154,14 @@ PlatformPeim (
             if (Len == 8) {
               TpmBase -= fdt32_to_cpu (RangesProp[0]);
             } else {
-              TpmBase -= fdt64_to_cpu (ReadUnaligned64 ((UINT64 *)RangesProp));
+              TpmBase -= fdt64_to_cpu (ReadUnaligned64 (RangesProp));
             }
 
             //
             // advance RangesProp to the parent bus address
             //
             RangesProp = (UINT32 *)((UINT8 *)RangesProp + Len / 2);
-            TpmBase += fdt64_to_cpu (ReadUnaligned64 ((UINT64 *)RangesProp));
+            TpmBase += fdt64_to_cpu (ReadUnaligned64 (RangesProp));
           }
         }
         break;

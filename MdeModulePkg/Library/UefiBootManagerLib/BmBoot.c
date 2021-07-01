@@ -1297,8 +1297,8 @@ BmGetRamDiskMemoryInfo (
   ASSERT_EFI_ERROR (Status);
   ASSERT ((DevicePathType (RamDiskDevicePath) == MEDIA_DEVICE_PATH) &&
           (DevicePathSubType (RamDiskDevicePath) == MEDIA_RAM_DISK_DP));
-  StartingAddr = ReadUnaligned64 ((UINT64 *) ((MEDIA_RAM_DISK_DEVICE_PATH *) RamDiskDevicePath)->StartingAddr);
-  EndingAddr   = ReadUnaligned64 ((UINT64 *) ((MEDIA_RAM_DISK_DEVICE_PATH *) RamDiskDevicePath)->EndingAddr);
+  StartingAddr = ReadUnaligned64 (((MEDIA_RAM_DISK_DEVICE_PATH *) RamDiskDevicePath)->StartingAddr);
+  EndingAddr   = ReadUnaligned64 (((MEDIA_RAM_DISK_DEVICE_PATH *) RamDiskDevicePath)->EndingAddr);
   *RamDiskSizeInPages = EFI_SIZE_TO_PAGES ((UINTN) (EndingAddr - StartingAddr + 1));
   return (VOID *) (UINTN) StartingAddr;
 }

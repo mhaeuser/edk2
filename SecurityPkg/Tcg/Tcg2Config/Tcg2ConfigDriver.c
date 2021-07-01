@@ -328,7 +328,7 @@ Tcg2ConfigDriverEntryPoint (
   Status = PrivateData->Tcg2Protocol->GetActivePcrBanks (PrivateData->Tcg2Protocol, &CurrentActivePCRBanks);
   ASSERT_EFI_ERROR (Status);
   PrivateData->PCRBanksDesired = CurrentActivePCRBanks;
-  UpdateDefaultPCRBanks (Tcg2ConfigBin + sizeof(UINT32), ReadUnaligned32((UINT32 *)Tcg2ConfigBin) - sizeof(UINT32), CurrentActivePCRBanks);
+  UpdateDefaultPCRBanks (Tcg2ConfigBin + sizeof(UINT32), ReadUnaligned32(Tcg2ConfigBin) - sizeof(UINT32), CurrentActivePCRBanks);
 
   //
   // Sync data from PCD to variable, so that we do not need detect again in S3 phase.

@@ -331,7 +331,7 @@ DevPathToTextBmc (
     Str,
     L"BMC(0x%x,0x%lx)",
     Bmc->InterfaceType,
-    ReadUnaligned64 ((UINT64 *) (&Bmc->BaseAddress))
+    ReadUnaligned64 (&Bmc->BaseAddress)
     );
 }
 

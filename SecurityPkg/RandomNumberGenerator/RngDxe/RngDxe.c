@@ -147,9 +147,9 @@ RngGetBytes (
       return EFI_NOT_READY;
     }
     if (Length >= sizeof (TempRand)) {
-      WriteUnaligned64 ((UINT64*)RandBuffer, TempRand[0]);
+      WriteUnaligned64 (RandBuffer, TempRand[0]);
       RandBuffer += sizeof (UINT64);
-      WriteUnaligned64 ((UINT64*)RandBuffer, TempRand[1]);
+      WriteUnaligned64 (RandBuffer, TempRand[1]);
       RandBuffer += sizeof (UINT64);
       Length -= sizeof (TempRand);
     } else {

@@ -80,7 +80,7 @@ Tpm2SetAlgorithmSet (
   //
   // Real data
   //
-  WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32(AlgorithmSet));
+  WriteUnaligned32 (Buffer, SwapBytes32(AlgorithmSet));
   Buffer += sizeof(UINT32);
 
   SendBufferSize = (UINT32)((UINTN)Buffer - (UINTN)&SendBuffer);

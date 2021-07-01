@@ -230,12 +230,12 @@ InitNoActionEvent (
   //
   // Set Digests Count
   //
-  WriteUnaligned32 ((UINT32 *)&NoActionEvent->Digests.count, DigestListCount);
+  WriteUnaligned32 (&NoActionEvent->Digests.count, DigestListCount);
 
   //
   // Set Event Size
   //
-  WriteUnaligned32((UINT32 *)DigestBuffer, EventSize);
+  WriteUnaligned32(DigestBuffer, EventSize);
 }
 
 /**

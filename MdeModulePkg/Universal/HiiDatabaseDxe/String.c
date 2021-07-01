@@ -164,7 +164,7 @@ GetUnicodeStringTextOrSize (
 
   StringSize = sizeof (CHAR16);
   StringPtr  = StringSrc;
-  while (ReadUnaligned16 ((UINT16 *) StringPtr) != 0) {
+  while (ReadUnaligned16 (StringPtr) != 0) {
     StringSize += sizeof (CHAR16);
     StringPtr += sizeof (CHAR16);
   }

@@ -97,11 +97,11 @@ CopyAuthSessionCommand (
   //
   if (AuthSessionIn != NULL) {
     //  sessionHandle
-    WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32(AuthSessionIn->sessionHandle));
+    WriteUnaligned32 ()Buffer, SwapBytes32(AuthSessionIn->sessionHandle));
     Buffer += sizeof(UINT32);
 
     // nonce
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (AuthSessionIn->nonce.size));
+    WriteUnaligned16 (Buffer, SwapBytes16 (AuthSessionIn->nonce.size));
     Buffer += sizeof(UINT16);
 
     CopyMem (Buffer, AuthSessionIn->nonce.buffer, AuthSessionIn->nonce.size);
@@ -112,18 +112,18 @@ CopyAuthSessionCommand (
     Buffer++;
 
     // hmac
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (AuthSessionIn->hmac.size));
+    WriteUnaligned16 (Buffer, SwapBytes16 (AuthSessionIn->hmac.size));
     Buffer += sizeof(UINT16);
 
     CopyMem (Buffer, AuthSessionIn->hmac.buffer, AuthSessionIn->hmac.size);
     Buffer += AuthSessionIn->hmac.size;
   } else {
     //  sessionHandle
-    WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32(TPM_RS_PW));
+    WriteUnaligned32 (Buffer, SwapBytes32(TPM_RS_PW));
     Buffer += sizeof(UINT32);
 
     // nonce = nullNonce
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(0));
+    WriteUnaligned16 (Buffer, SwapBytes16(0));
     Buffer += sizeof(UINT16);
 
     // sessionAttributes = 0
@@ -131,7 +131,7 @@ CopyAuthSessionCommand (
     Buffer++;
 
     // hmac = nullAuth
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(0));
+    WriteUnaligned16 (Buffer, SwapBytes16(0));
     Buffer += sizeof(UINT16);
   }
 
@@ -164,7 +164,7 @@ CopyAuthSessionResponse (
   Buffer = (UINT8 *)AuthSessionIn;
 
   // nonce
-  AuthSessionOut->nonce.size = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
+  AuthSessionOut->nonce.size = SwapBytes16 (ReadUnaligned16 (Buffer));
   Buffer += sizeof(UINT16);
   if (AuthSessionOut->nonce.size > sizeof(TPMU_HA)) {
     DEBUG ((DEBUG_ERROR, "CopyAuthSessionResponse - nonce.size error %x\n", AuthSessionOut->nonce.size));
@@ -179,7 +179,7 @@ CopyAuthSessionResponse (
   Buffer++;
 
   // hmac
-  AuthSessionOut->hmac.size = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
+  AuthSessionOut->hmac.size = SwapBytes16 (ReadUnaligned16 (Buffer));
   Buffer += sizeof(UINT16);
   if (AuthSessionOut->hmac.size > sizeof(TPMU_HA)) {
     DEBUG ((DEBUG_ERROR, "CopyAuthSessionResponse - hmac.size error %x\n", AuthSessionOut->hmac.size));

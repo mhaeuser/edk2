@@ -1286,7 +1286,7 @@ PciExpressReadBuffer (
     //
     // Read a word if StartAddress is word aligned
     //
-    WriteUnaligned16 ((UINT16 *) Buffer, (UINT16) PciExpressRead16 (StartAddress));
+    WriteUnaligned16 (Buffer, (UINT16) PciExpressRead16 (StartAddress));
 
     StartAddress += sizeof (UINT16);
     Size -= sizeof (UINT16);
@@ -1297,7 +1297,7 @@ PciExpressReadBuffer (
     //
     // Read as many double words as possible
     //
-    WriteUnaligned32 ((UINT32 *) Buffer, (UINT32) PciExpressRead32 (StartAddress));
+    WriteUnaligned32 (Buffer, (UINT32) PciExpressRead32 (StartAddress));
 
     StartAddress += sizeof (UINT32);
     Size -= sizeof (UINT32);
@@ -1308,7 +1308,7 @@ PciExpressReadBuffer (
     //
     // Read the last remaining word if exist
     //
-    WriteUnaligned16 ((UINT16 *) Buffer, (UINT16) PciExpressRead16 (StartAddress));
+    WriteUnaligned16 (Buffer, (UINT16) PciExpressRead16 (StartAddress));
     StartAddress += sizeof (UINT16);
     Size -= sizeof (UINT16);
     Buffer = (UINT16*)Buffer + 1;
@@ -1386,7 +1386,7 @@ PciExpressWriteBuffer (
     //
     // Write a word if StartAddress is word aligned
     //
-    PciExpressWrite16 (StartAddress, ReadUnaligned16 ((UINT16*)Buffer));
+    PciExpressWrite16 (StartAddress, ReadUnaligned16 (Buffer));
     StartAddress += sizeof (UINT16);
     Size -= sizeof (UINT16);
     Buffer = (UINT16*)Buffer + 1;
@@ -1396,7 +1396,7 @@ PciExpressWriteBuffer (
     //
     // Write as many double words as possible
     //
-    PciExpressWrite32 (StartAddress, ReadUnaligned32 ((UINT32*)Buffer));
+    PciExpressWrite32 (StartAddress, ReadUnaligned32 (Buffer));
     StartAddress += sizeof (UINT32);
     Size -= sizeof (UINT32);
     Buffer = (UINT32*)Buffer + 1;
@@ -1406,7 +1406,7 @@ PciExpressWriteBuffer (
     //
     // Write the last remaining word if exist
     //
-    PciExpressWrite16 (StartAddress, ReadUnaligned16 ((UINT16*)Buffer));
+    PciExpressWrite16 (StartAddress, ReadUnaligned16 (Buffer));
     StartAddress += sizeof (UINT16);
     Size -= sizeof (UINT16);
     Buffer = (UINT16*)Buffer + 1;

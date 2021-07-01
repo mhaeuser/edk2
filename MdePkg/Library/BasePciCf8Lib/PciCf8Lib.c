@@ -1641,7 +1641,7 @@ PciCf8ReadBuffer (
     //
     // Read a word if StartAddress is word aligned
     //
-    WriteUnaligned16 ((UINT16 *)Buffer, (UINT16) PciCf8Read16 (StartAddress));
+    WriteUnaligned16 (Buffer, (UINT16) PciCf8Read16 (StartAddress));
 
     StartAddress += sizeof (UINT16);
     Size -= sizeof (UINT16);
@@ -1652,7 +1652,7 @@ PciCf8ReadBuffer (
     //
     // Read as many double words as possible
     //
-    WriteUnaligned32 ((UINT32 *)Buffer, (UINT32) PciCf8Read32 (StartAddress));
+    WriteUnaligned32 (Buffer, (UINT32) PciCf8Read32 (StartAddress));
     StartAddress += sizeof (UINT32);
     Size -= sizeof (UINT32);
     Buffer = (UINT32*)Buffer + 1;
@@ -1662,7 +1662,7 @@ PciCf8ReadBuffer (
     //
     // Read the last remaining word if exist
     //
-    WriteUnaligned16 ((UINT16 *)Buffer, (UINT16) PciCf8Read16 (StartAddress));
+    WriteUnaligned16 (Buffer, (UINT16) PciCf8Read16 (StartAddress));
     StartAddress += sizeof (UINT16);
     Size -= sizeof (UINT16);
     Buffer = (UINT16*)Buffer + 1;
@@ -1741,7 +1741,7 @@ PciCf8WriteBuffer (
     //
     // Write a word if StartAddress is word aligned
     //
-    PciCf8Write16 (StartAddress, ReadUnaligned16 ((UINT16*)Buffer));
+    PciCf8Write16 (StartAddress, ReadUnaligned16 (Buffer));
     StartAddress += sizeof (UINT16);
     Size -= sizeof (UINT16);
     Buffer = (UINT16*)Buffer + 1;
@@ -1751,7 +1751,7 @@ PciCf8WriteBuffer (
     //
     // Write as many double words as possible
     //
-    PciCf8Write32 (StartAddress, ReadUnaligned32 ((UINT32*)Buffer));
+    PciCf8Write32 (StartAddress, ReadUnaligned32 (Buffer));
     StartAddress += sizeof (UINT32);
     Size -= sizeof (UINT32);
     Buffer = (UINT32*)Buffer + 1;
@@ -1761,7 +1761,7 @@ PciCf8WriteBuffer (
     //
     // Write the last remaining word if exist
     //
-    PciCf8Write16 (StartAddress, ReadUnaligned16 ((UINT16*)Buffer));
+    PciCf8Write16 (StartAddress, ReadUnaligned16 (Buffer));
     StartAddress += sizeof (UINT16);
     Size -= sizeof (UINT16);
     Buffer = (UINT16*)Buffer + 1;

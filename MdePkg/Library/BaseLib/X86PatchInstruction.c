@@ -65,16 +65,16 @@ PatchInstructionX86 (
 
   case 2:
     ASSERT (PatchValue <= MAX_UINT16);
-    WriteUnaligned16 ((UINT16 *)(UINTN)InstructionEnd - 1, (UINT16)PatchValue);
+    WriteUnaligned16 ((UINT8 *)(UINTN)InstructionEnd - sizeof (UINT16), (UINT16)PatchValue);
     break;
 
   case 4:
     ASSERT (PatchValue <= MAX_UINT32);
-    WriteUnaligned32 ((UINT32 *)(UINTN)InstructionEnd - 1, (UINT32)PatchValue);
+    WriteUnaligned32 ((UINT8 *)(UINTN)InstructionEnd - sizeof (UINT32), (UINT32)PatchValue);
     break;
 
   case 8:
-    WriteUnaligned64 ((UINT64 *)(UINTN)InstructionEnd - 1, PatchValue);
+    WriteUnaligned64 ((UINT8 *)(UINTN)InstructionEnd - sizeof (UINT64), PatchValue);
     break;
 
   default:

@@ -114,11 +114,11 @@ Tpm2HashSequenceStart (
   Buffer = (UINT8 *)&Cmd.Auth;
 
   // auth = nullAuth
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(0));
+  WriteUnaligned16 (Buffer, SwapBytes16(0));
   Buffer += sizeof(UINT16);
 
   // hashAlg
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(HashAlg));
+  WriteUnaligned16 (Buffer, SwapBytes16(HashAlg));
   Buffer += sizeof(UINT16);
 
   CmdSize = (UINT32)(Buffer - (UINT8 *)&Cmd);
@@ -212,7 +212,7 @@ Tpm2SequenceUpdate (
   Cmd.AuthorizationSize = SwapBytes32(SessionInfoSize);
 
   // buffer.size
-  WriteUnaligned16 ((UINT16 *)BufferPtr, SwapBytes16(Buffer->size));
+  WriteUnaligned16 (BufferPtr, SwapBytes16(Buffer->size));
   BufferPtr += sizeof(UINT16);
 
   CopyMem(BufferPtr, &Buffer->buffer, Buffer->size);
@@ -321,7 +321,7 @@ Tpm2EventSequenceComplete (
   Cmd.AuthorizationSize = SwapBytes32(SessionInfoSize + SessionInfoSize2);
 
   // buffer.size
-  WriteUnaligned16 ((UINT16 *)BufferPtr, SwapBytes16(Buffer->size));
+  WriteUnaligned16 (BufferPtr, SwapBytes16(Buffer->size));
   BufferPtr += sizeof(UINT16);
 
   CopyMem(BufferPtr, &Buffer->buffer[0], Buffer->size);
@@ -368,7 +368,7 @@ Tpm2EventSequenceComplete (
   BufferPtr = (UINT8 *)&Res.Results;
 
   // count
-  Results->count = SwapBytes32(ReadUnaligned32 ((UINT32 *)BufferPtr));
+  Results->count = SwapBytes32(ReadUnaligned32 (BufferPtr));
   if (Results->count > HASH_COUNT) {
     DEBUG ((DEBUG_ERROR, "Tpm2EventSequenceComplete - Results->count error %x\n", Results->count));
     return EFI_DEVICE_ERROR;
@@ -377,7 +377,7 @@ Tpm2EventSequenceComplete (
   BufferPtr += sizeof(UINT32);
 
   for (Index = 0; Index < Results->count; Index++) {
-    Results->digests[Index].hashAlg = SwapBytes16(ReadUnaligned16 ((UINT16 *)BufferPtr));
+    Results->digests[Index].hashAlg = SwapBytes16(ReadUnaligned16 (BufferPtr));
     BufferPtr += sizeof(UINT16);
 
     DigestSize = GetHashSizeFromAlgo (Results->digests[Index].hashAlg);
@@ -443,14 +443,14 @@ Tpm2SequenceComplete (
   Cmd.AuthorizationSize = SwapBytes32(SessionInfoSize);
 
   // buffer.size
-  WriteUnaligned16 ((UINT16 *)BufferPtr, SwapBytes16(Buffer->size));
+  WriteUnaligned16 (BufferPtr, SwapBytes16(Buffer->size));
   BufferPtr += sizeof(UINT16);
 
   CopyMem(BufferPtr, &Buffer->buffer[0], Buffer->size);
   BufferPtr += Buffer->size;
 
   // Hierarchy
-  WriteUnaligned32 ((UINT32 *)BufferPtr, SwapBytes32 (TPM_RH_NULL));
+  WriteUnaligned32 (BufferPtr, SwapBytes32 (TPM_RH_NULL));
   BufferPtr += sizeof (UINT32);
 
   CmdSize = (UINT32)(BufferPtr - (UINT8 *)&Cmd);
@@ -494,7 +494,7 @@ Tpm2SequenceComplete (
   BufferPtr = (UINT8 *)&Res.Digest;
 
   // digestSize
-  Result->size = SwapBytes16(ReadUnaligned16 ((UINT16 *)BufferPtr));
+  Result->size = SwapBytes16(ReadUnaligned16 (BufferPtr));
   if (Result->size > sizeof(TPMU_HA)){
     DEBUG ((DEBUG_ERROR, "Tpm2SequenceComplete - Result->size error %x\n", Result->size));
     return EFI_DEVICE_ERROR;

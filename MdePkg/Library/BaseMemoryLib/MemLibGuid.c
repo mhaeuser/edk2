@@ -42,12 +42,12 @@ CopyGuid (
   )
 {
   WriteUnaligned64 (
-    (UINT64*)DestinationGuid,
-    ReadUnaligned64 ((CONST UINT64*)SourceGuid)
+    DestinationGuid,
+    ReadUnaligned64 (SourceGuid)
     );
   WriteUnaligned64 (
-    (UINT64*)DestinationGuid + 1,
-    ReadUnaligned64 ((CONST UINT64*)SourceGuid + 1)
+    (UINT8*)DestinationGuid + sizeof (UINT64),
+    ReadUnaligned64 ((CONST UINT8*)SourceGuid + sizeof (UINT64))
     );
   return DestinationGuid;
 }
@@ -80,10 +80,10 @@ CompareGuid (
   UINT64  HighPartOfGuid1;
   UINT64  HighPartOfGuid2;
 
-  LowPartOfGuid1  = ReadUnaligned64 ((CONST UINT64*) Guid1);
-  LowPartOfGuid2  = ReadUnaligned64 ((CONST UINT64*) Guid2);
-  HighPartOfGuid1 = ReadUnaligned64 ((CONST UINT64*) Guid1 + 1);
-  HighPartOfGuid2 = ReadUnaligned64 ((CONST UINT64*) Guid2 + 1);
+  LowPartOfGuid1  = ReadUnaligned64 (Guid1);
+  LowPartOfGuid2  = ReadUnaligned64 (Guid2);
+  HighPartOfGuid1 = ReadUnaligned64 ((CONST UINT8*) Guid1 + sizeof (UINT64));
+  HighPartOfGuid2 = ReadUnaligned64 ((CONST UINT8*) Guid2 + sizeof (UINT64));
 
   return (BOOLEAN) (LowPartOfGuid1 == LowPartOfGuid2 && HighPartOfGuid1 == HighPartOfGuid2);
 }
@@ -158,8 +158,8 @@ IsZeroGuid (
   UINT64  LowPartOfGuid;
   UINT64  HighPartOfGuid;
 
-  LowPartOfGuid  = ReadUnaligned64 ((CONST UINT64*) Guid);
-  HighPartOfGuid = ReadUnaligned64 ((CONST UINT64*) Guid + 1);
+  LowPartOfGuid  = ReadUnaligned64 (Guid);
+  HighPartOfGuid = ReadUnaligned64 ((CONST UINT8*) Guid + sizeof (UINT64));
 
   return (BOOLEAN) (LowPartOfGuid == 0 && HighPartOfGuid == 0);
 }

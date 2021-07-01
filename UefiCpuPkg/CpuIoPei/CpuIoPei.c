@@ -231,19 +231,19 @@ CpuMemoryServiceRead (
       if (Aligned) {
         *((UINT16 *)Uint8Buffer) = MmioRead16 ((UINTN)Address);
       } else {
-        WriteUnaligned16 ((UINT16 *)Uint8Buffer, MmioRead16 ((UINTN)Address));
+        WriteUnaligned16 (Uint8Buffer, MmioRead16 ((UINTN)Address));
       }
     } else if (OperationWidth == EfiPeiCpuIoWidthUint32) {
       if (Aligned) {
         *((UINT32 *)Uint8Buffer) = MmioRead32 ((UINTN)Address);
       } else {
-        WriteUnaligned32 ((UINT32 *)Uint8Buffer, MmioRead32 ((UINTN)Address));
+        WriteUnaligned32 (Uint8Buffer, MmioRead32 ((UINTN)Address));
       }
     } else if (OperationWidth == EfiPeiCpuIoWidthUint64) {
       if (Aligned) {
         *((UINT64 *)Uint8Buffer) = MmioRead64 ((UINTN)Address);
       } else {
-        WriteUnaligned64 ((UINT64 *)Uint8Buffer, MmioRead64 ((UINTN)Address));
+        WriteUnaligned64 (Uint8Buffer, MmioRead64 ((UINTN)Address));
       }
     }
   }
@@ -305,19 +305,19 @@ CpuMemoryServiceWrite (
       if (Aligned) {
         MmioWrite16 ((UINTN)Address, *((UINT16 *)Uint8Buffer));
       } else {
-        MmioWrite16 ((UINTN)Address, ReadUnaligned16 ((UINT16 *)Uint8Buffer));
+        MmioWrite16 ((UINTN)Address, ReadUnaligned16 (Uint8Buffer));
       }
     } else if (OperationWidth == EfiPeiCpuIoWidthUint32) {
       if (Aligned) {
         MmioWrite32 ((UINTN)Address, *((UINT32 *)Uint8Buffer));
       } else {
-        MmioWrite32 ((UINTN)Address, ReadUnaligned32 ((UINT32 *)Uint8Buffer));
+        MmioWrite32 ((UINTN)Address, ReadUnaligned32 (Uint8Buffer));
       }
     } else if (OperationWidth == EfiPeiCpuIoWidthUint64) {
       if (Aligned) {
         MmioWrite64 ((UINTN)Address, *((UINT64 *)Uint8Buffer));
       } else {
-        MmioWrite64 ((UINTN)Address, ReadUnaligned64 ((UINT64 *)Uint8Buffer));
+        MmioWrite64 ((UINTN)Address, ReadUnaligned64 (Uint8Buffer));
       }
     }
   }
@@ -404,13 +404,13 @@ CpuIoServiceRead (
       if (Aligned) {
         *((UINT16 *)Uint8Buffer) = IoRead16 ((UINTN)Address);
       } else {
-        WriteUnaligned16 ((UINT16 *)Uint8Buffer, IoRead16 ((UINTN)Address));
+        WriteUnaligned16 (Uint8Buffer, IoRead16 ((UINTN)Address));
       }
     } else if (OperationWidth == EfiPeiCpuIoWidthUint32) {
       if (Aligned) {
         *((UINT32 *)Uint8Buffer) = IoRead32 ((UINTN)Address);
       } else {
-        WriteUnaligned32 ((UINT32 *)Uint8Buffer, IoRead32 ((UINTN)Address));
+        WriteUnaligned32 (Uint8Buffer, IoRead32 ((UINTN)Address));
       }
     }
   }
@@ -501,13 +501,13 @@ CpuIoServiceWrite (
       if (Aligned) {
         IoWrite16 ((UINTN)Address, *((UINT16 *)Uint8Buffer));
       } else {
-        IoWrite16 ((UINTN)Address, ReadUnaligned16 ((UINT16 *)Uint8Buffer));
+        IoWrite16 ((UINTN)Address, ReadUnaligned16 (Uint8Buffer));
       }
     } else if (OperationWidth == EfiPeiCpuIoWidthUint32) {
       if (Aligned) {
         IoWrite32 ((UINTN)Address, *((UINT32 *)Uint8Buffer));
       } else {
-        IoWrite32 ((UINTN)Address, ReadUnaligned32 ((UINT32 *)Uint8Buffer));
+        IoWrite32 ((UINTN)Address, ReadUnaligned32 (Uint8Buffer));
       }
     }
   }

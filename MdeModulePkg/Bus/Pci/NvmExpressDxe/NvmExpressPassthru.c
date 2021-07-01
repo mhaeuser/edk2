@@ -707,7 +707,7 @@ NvmExpressPassThru (
   } else {
     Private->SqTdbl[QueueId].Sqt ^= 1;
   }
-  Data = ReadUnaligned32 ((UINT32*)&Private->SqTdbl[QueueId]);
+  Data = ReadUnaligned32 (&Private->SqTdbl[QueueId]);
   Status = PciIo->Mem.Write (
                PciIo,
                EfiPciIoWidthUint32,
@@ -840,7 +840,7 @@ NvmExpressPassThru (
     Private->Pt[QueueId] ^= 1;
   }
 
-  Data = ReadUnaligned32 ((UINT32*)&Private->CqHdbl[QueueId]);
+  Data = ReadUnaligned32 (&Private->CqHdbl[QueueId]);
   PreviousStatus = Status;
   Status = PciIo->Mem.Write (
                PciIo,

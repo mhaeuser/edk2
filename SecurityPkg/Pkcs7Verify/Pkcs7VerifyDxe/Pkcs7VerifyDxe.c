@@ -647,7 +647,7 @@ P7CheckRevocationByHash (
     //
     // Retrieve the Certificate data
     //
-    CertSize = (UINTN) ReadUnaligned32 ((UINT32 *) CertPtr);
+    CertSize = (UINTN) ReadUnaligned32 (CertPtr);
     Cert     = (UINT8 *)CertPtr + sizeof (UINT32);
 
     if (IsCertHashRevoked (Cert, CertSize, RevokedDb, &RevocationTime)) {
@@ -812,7 +812,7 @@ P7CheckRevocation (
     //
     // Retrieve the Certificate data
     //
-    CertSize = (UINTN) ReadUnaligned32 ((UINT32 *) CertPtr);
+    CertSize = (UINTN) ReadUnaligned32 (CertPtr);
     Cert     = (UINT8 *)CertPtr + sizeof (UINT32);
 
     if (IsCertHashRevoked (Cert, CertSize, RevokedDb, &RevocationTime)) {

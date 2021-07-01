@@ -73,7 +73,7 @@ PciCfg2Read (
       //
       // Aligned Pci address access
       //
-      WriteUnaligned16 (((UINT16 *) Buffer), PciRead16 (PciLibAddress));
+      WriteUnaligned16 (Buffer, PciRead16 (PciLibAddress));
     } else {
       //
       // Unaligned Pci address access, break up the request into byte by byte.
@@ -86,13 +86,13 @@ PciCfg2Read (
       //
       // Aligned Pci address access
       //
-      WriteUnaligned32 (((UINT32 *) Buffer), PciRead32 (PciLibAddress));
+      WriteUnaligned32 (Buffer, PciRead32 (PciLibAddress));
     } else if ((PciLibAddress & 0x01) == 0) {
       //
       // Unaligned Pci address access, break up the request into word by word.
       //
-      WriteUnaligned16 (((UINT16 *) Buffer), PciRead16 (PciLibAddress));
-      WriteUnaligned16 (((UINT16 *) Buffer + 1), PciRead16 (PciLibAddress + 2));
+      WriteUnaligned16 (Buffer, PciRead16 (PciLibAddress));
+      WriteUnaligned16 (((UINT8 *) Buffer + sizeof (UINT16)), PciRead16 (PciLibAddress + 2));
     } else {
       //
       // Unaligned Pci address access, break up the request into byte by byte.
@@ -145,7 +145,7 @@ PciCfg2Write (
       //
       // Aligned Pci address access
       //
-      PciWrite16 (PciLibAddress, ReadUnaligned16 ((UINT16 *) Buffer));
+      PciWrite16 (PciLibAddress, ReadUnaligned16 (Buffer));
     } else {
       //
       // Unaligned Pci address access, break up the request into byte by byte.
@@ -158,13 +158,13 @@ PciCfg2Write (
       //
       // Aligned Pci address access
       //
-      PciWrite32 (PciLibAddress, ReadUnaligned32 ((UINT32 *) Buffer));
+      PciWrite32 (PciLibAddress, ReadUnaligned32 (Buffer));
     } else if ((PciLibAddress & 0x01) == 0) {
       //
       // Unaligned Pci address access, break up the request into word by word.
       //
-      PciWrite16 (PciLibAddress, ReadUnaligned16 ((UINT16 *) Buffer));
-      PciWrite16 (PciLibAddress + 2, ReadUnaligned16 ((UINT16 *) Buffer + 1));
+      PciWrite16 (PciLibAddress, ReadUnaligned16 (Buffer));
+      PciWrite16 (PciLibAddress + 2, ReadUnaligned16 ((UINT8 *) Buffer + sizeof (UINT16)));
     } else {
       //
       // Unaligned Pci address access, break up the request into byte by byte.
@@ -227,8 +227,8 @@ PciCfg2Modify (
       //
       // Aligned Pci address access
       //
-      ClearValue16  = (UINT16) (~ReadUnaligned16 ((UINT16 *) ClearBits));
-      SetValue16    = ReadUnaligned16 ((UINT16 *) SetBits);
+      ClearValue16  = (UINT16) (~ReadUnaligned16 (ClearBits));
+      SetValue16    = ReadUnaligned16 (SetBits);
       PciAndThenOr16 (PciLibAddress, ClearValue16, SetValue16);
     } else {
       //
@@ -242,19 +242,19 @@ PciCfg2Modify (
       //
       // Aligned Pci address access
       //
-      ClearValue32  = (UINT32) (~ReadUnaligned32 ((UINT32 *) ClearBits));
-      SetValue32    = ReadUnaligned32 ((UINT32 *) SetBits);
+      ClearValue32  = (UINT32) (~ReadUnaligned32 (ClearBits));
+      SetValue32    = ReadUnaligned32 (SetBits);
       PciAndThenOr32 (PciLibAddress, ClearValue32, SetValue32);
     } else if ((PciLibAddress & 0x01) == 0) {
       //
       // Unaligned Pci address access, break up the request into word by word.
       //
-      ClearValue16  = (UINT16) (~ReadUnaligned16 ((UINT16 *) ClearBits));
-      SetValue16    = ReadUnaligned16 ((UINT16 *) SetBits);
+      ClearValue16  = (UINT16) (~ReadUnaligned16 (ClearBits));
+      SetValue16    = ReadUnaligned16 (SetBits);
       PciAndThenOr16 (PciLibAddress, ClearValue16, SetValue16);
 
-      ClearValue16  = (UINT16) (~ReadUnaligned16 ((UINT16 *) ClearBits + 1));
-      SetValue16    = ReadUnaligned16 ((UINT16 *) SetBits + 1);
+      ClearValue16  = (UINT16) (~ReadUnaligned16 ((UINT8 *) ClearBits + sizeof (UINT16)));
+      SetValue16    = ReadUnaligned16 ((UINT8 *) SetBits + sizeof (UINT16));
       PciAndThenOr16 (PciLibAddress + 2, ClearValue16, SetValue16);
     } else {
       //

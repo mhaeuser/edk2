@@ -611,8 +611,8 @@ Dhcp6UpdateIaInfo (
   // The inner options still start with 2 bytes option-code and 2 bytes option-len.
   //
   if (Instance->Config->IaDescriptor.Type == Dhcp6OptIana) {
-    T1 = NTOHL (ReadUnaligned32 ((UINT32 *) (Option + 8)));
-    T2 = NTOHL (ReadUnaligned32 ((UINT32 *) (Option + 12)));
+    T1 = NTOHL (ReadUnaligned32 (Option + 8));
+    T2 = NTOHL (ReadUnaligned32 (Option + 12));
     //
     // Refer to RFC3155 Chapter 22.4. If a client receives an IA_NA with T1 greater than T2,
     // and both T1 and T2 are greater than 0, the client discards the IA_NA option and processes
@@ -622,12 +622,12 @@ Dhcp6UpdateIaInfo (
       return EFI_DEVICE_ERROR;
     }
     IaInnerOpt = Option + 16;
-    IaInnerLen = (UINT16) (NTOHS (ReadUnaligned16 ((UINT16 *) (Option + 2))) - 12);
+    IaInnerLen = (UINT16) (NTOHS (ReadUnaligned16 (Option + 2)) - 12);
   } else {
     T1 = 0;
     T2 = 0;
     IaInnerOpt = Option + 8;
-    IaInnerLen = (UINT16) (NTOHS (ReadUnaligned16 ((UINT16 *) (Option + 2))) - 4);
+    IaInnerLen = (UINT16) (NTOHS (ReadUnaligned16 (Option + 2)) - 4);
   }
 
   //
@@ -653,7 +653,7 @@ Dhcp6UpdateIaInfo (
   Option  = Dhcp6SeekOption (IaInnerOpt, IaInnerLen, Dhcp6OptStatusCode);
 
   if (Option != NULL) {
-    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *) (Option + 4)));
+    StsCode = NTOHS (ReadUnaligned16 (Option + 4));
     if (StsCode != Dhcp6StsSuccess) {
       return EFI_DEVICE_ERROR;
     }
@@ -710,7 +710,7 @@ Dhcp6SeekStsOption (
               );
 
   if (*Option != NULL) {
-    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *) (*Option + 4)));
+    StsCode = NTOHS (ReadUnaligned16 (*Option + 4));
     if (StsCode != Dhcp6StsSuccess) {
       return EFI_DEVICE_ERROR;
     }
@@ -771,10 +771,10 @@ Dhcp6SeekStsOption (
   //
   if (Instance->Config->IaDescriptor.Type == Dhcp6OptIana) {
     IaInnerOpt = *Option + 16;
-    IaInnerLen = (UINT16) (NTOHS (ReadUnaligned16 ((UINT16 *) (*Option + 2))) - 12);
+    IaInnerLen = (UINT16) (NTOHS (ReadUnaligned16 (*Option + 2)) - 12);
   } else {
     IaInnerOpt = *Option + 8;
-    IaInnerLen = (UINT16) (NTOHS (ReadUnaligned16 ((UINT16 *) (*Option + 2))) - 4);
+    IaInnerLen = (UINT16) (NTOHS (ReadUnaligned16 (*Option + 2)) - 4);
   }
 
   //
@@ -2240,7 +2240,7 @@ Dhcp6HandleReplyMsg (
     //
     // Any error status code option is found.
     //
-    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *) (Option + 4)));
+    StsCode = NTOHS (ReadUnaligned16 (Option + 4));
     switch (StsCode) {
     case Dhcp6StsUnspecFail:
       //

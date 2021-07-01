@@ -940,7 +940,7 @@ PingNetIp4IsUnspecifiedAddr (
   IN CONST EFI_IPv4_ADDRESS *Address
   )
 {
-  return  ((BOOLEAN)((ReadUnaligned32 ((UINT32*)&Address->Addr[0])) == 0x00000000));
+  return  ((BOOLEAN)((ReadUnaligned32 (&Address->Addr[0])) == 0x00000000));
 }
 
 /**

@@ -128,22 +128,22 @@ Tpm2PolicySecret (
   //
   // Real data
   //
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(NonceTPM->size));
+  WriteUnaligned16 (Buffer, SwapBytes16(NonceTPM->size));
   Buffer += sizeof(UINT16);
   CopyMem (Buffer, NonceTPM->buffer, NonceTPM->size);
   Buffer += NonceTPM->size;
 
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(CpHashA->size));
+  WriteUnaligned16 (Buffer, SwapBytes16(CpHashA->size));
   Buffer += sizeof(UINT16);
   CopyMem (Buffer, CpHashA->buffer, CpHashA->size);
   Buffer += CpHashA->size;
 
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(PolicyRef->size));
+  WriteUnaligned16 (Buffer, SwapBytes16(PolicyRef->size));
   Buffer += sizeof(UINT16);
   CopyMem (Buffer, PolicyRef->buffer, PolicyRef->size);
   Buffer += PolicyRef->size;
 
-  WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32((UINT32)Expiration));
+  WriteUnaligned32 (Buffer, SwapBytes32((UINT32)Expiration));
   Buffer += sizeof(UINT32);
 
   SendBufferSize = (UINT32)((UINTN)Buffer - (UINTN)&SendBuffer);
@@ -173,7 +173,7 @@ Tpm2PolicySecret (
   // Return the response
   //
   Buffer = (UINT8 *)&RecvBuffer.Timeout;
-  Timeout->size = SwapBytes16(ReadUnaligned16 ((UINT16 *)Buffer));
+  Timeout->size = SwapBytes16(ReadUnaligned16 (Buffer));
   if (Timeout->size > sizeof(UINT64)) {
     DEBUG ((DEBUG_ERROR, "Tpm2PolicySecret - Timeout->size error %x\n", Timeout->size));
     Status = EFI_DEVICE_ERROR;
@@ -183,11 +183,11 @@ Tpm2PolicySecret (
   Buffer += sizeof(UINT16);
   CopyMem (Timeout->buffer, Buffer, Timeout->size);
 
-  PolicyTicket->tag = SwapBytes16(ReadUnaligned16 ((UINT16 *)Buffer));
+  PolicyTicket->tag = SwapBytes16(ReadUnaligned16 (Buffer));
   Buffer += sizeof(UINT16);
-  PolicyTicket->hierarchy = SwapBytes32(ReadUnaligned32 ((UINT32 *)Buffer));
+  PolicyTicket->hierarchy = SwapBytes32(ReadUnaligned32 (Buffer));
   Buffer += sizeof(UINT32);
-  PolicyTicket->digest.size = SwapBytes16(ReadUnaligned16 ((UINT16 *)Buffer));
+  PolicyTicket->digest.size = SwapBytes16(ReadUnaligned16 (Buffer));
   Buffer += sizeof(UINT16);
   if (PolicyTicket->digest.size > sizeof(TPMU_HA)) {
     DEBUG ((DEBUG_ERROR, "Tpm2PolicySecret - digest.size error %x\n", PolicyTicket->digest.size));
@@ -241,10 +241,10 @@ Tpm2PolicyOR (
 
   SendBuffer.PolicySession = SwapBytes32 (PolicySession);
   Buffer = (UINT8 *)&SendBuffer.HashList;
-  WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32 (HashList->count));
+  WriteUnaligned32 (Buffer, SwapBytes32 (HashList->count));
   Buffer += sizeof(UINT32);
   for (Index = 0; Index < HashList->count; Index++) {
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (HashList->digests[Index].size));
+    WriteUnaligned16 (Buffer, SwapBytes16 (HashList->digests[Index].size));
     Buffer += sizeof(UINT16);
     CopyMem (Buffer, HashList->digests[Index].buffer, HashList->digests[Index].size);
     Buffer += HashList->digests[Index].size;

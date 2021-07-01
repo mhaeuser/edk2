@@ -82,12 +82,12 @@ Tpm2StartAuthSession (
   SendBuffer.Bind = SwapBytes32 (Bind);
   Buffer = (UINT8 *)&SendBuffer.NonceCaller;
 
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (NonceCaller->size));
+  WriteUnaligned16 (Buffer, SwapBytes16 (NonceCaller->size));
   Buffer += sizeof(UINT16);
   CopyMem (Buffer, NonceCaller->buffer, NonceCaller->size);
   Buffer += NonceCaller->size;
 
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Salt->size));
+  WriteUnaligned16 (Buffer, SwapBytes16 (Salt->size));
   Buffer += sizeof(UINT16);
   CopyMem (Buffer, Salt->secret, Salt->size);
   Buffer += Salt->size;
@@ -95,31 +95,31 @@ Tpm2StartAuthSession (
   *(TPM_SE *)Buffer = SessionType;
   Buffer++;
 
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Symmetric->algorithm));
+  WriteUnaligned16 (Buffer, SwapBytes16 (Symmetric->algorithm));
   Buffer += sizeof(UINT16);
   switch (Symmetric->algorithm) {
   case TPM_ALG_NULL:
     break;
   case TPM_ALG_AES:
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Symmetric->keyBits.aes));
+    WriteUnaligned16 (Buffer, SwapBytes16 (Symmetric->keyBits.aes));
     Buffer += sizeof(UINT16);
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Symmetric->mode.aes));
+    WriteUnaligned16 (Buffer, SwapBytes16 (Symmetric->mode.aes));
     Buffer += sizeof(UINT16);
     break;
   case TPM_ALG_SM4:
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Symmetric->keyBits.SM4));
+    WriteUnaligned16 (Buffer, SwapBytes16 (Symmetric->keyBits.SM4));
     Buffer += sizeof(UINT16);
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Symmetric->mode.SM4));
+    WriteUnaligned16 (Buffer, SwapBytes16 (Symmetric->mode.SM4));
     Buffer += sizeof(UINT16);
     break;
   case TPM_ALG_SYMCIPHER:
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Symmetric->keyBits.sym));
+    WriteUnaligned16 (Buffer, SwapBytes16 (Symmetric->keyBits.sym));
     Buffer += sizeof(UINT16);
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Symmetric->mode.sym));
+    WriteUnaligned16 (Buffer, SwapBytes16 (Symmetric->mode.sym));
     Buffer += sizeof(UINT16);
     break;
   case TPM_ALG_XOR:
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Symmetric->keyBits.xor));
+    WriteUnaligned16 (Buffer, SwapBytes16 (Symmetric->keyBits.xor));
     Buffer += sizeof(UINT16);
     break;
   default:
@@ -128,7 +128,7 @@ Tpm2StartAuthSession (
     return EFI_UNSUPPORTED;
   }
 
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (AuthHash));
+  WriteUnaligned16 (Buffer, SwapBytes16 (AuthHash));
   Buffer += sizeof(UINT16);
 
   SendBufferSize = (UINT32) ((UINTN)Buffer - (UINTN)&SendBuffer);

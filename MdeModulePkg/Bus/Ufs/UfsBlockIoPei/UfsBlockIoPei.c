@@ -332,8 +332,8 @@ UfsPeimRead10 (
   ZeroMem (Cdb, sizeof (Cdb));
 
   Cdb[0] = EFI_SCSI_OP_READ10;
-  WriteUnaligned32 ((UINT32 *)&Cdb[2], SwapBytes32 ((UINT32) StartLba));
-  WriteUnaligned16 ((UINT16 *)&Cdb[7], SwapBytes16 ((UINT16) SectorNum));
+  WriteUnaligned32 (&Cdb[2], SwapBytes32 ((UINT32) StartLba));
+  WriteUnaligned16 (&Cdb[7], SwapBytes16 ((UINT16) SectorNum));
 
   Packet.Timeout          = UFS_TIMEOUT;
   Packet.Cdb              = Cdb;
@@ -394,8 +394,8 @@ UfsPeimRead16 (
   ZeroMem (Cdb, sizeof (Cdb));
 
   Cdb[0] = EFI_SCSI_OP_READ16;
-  WriteUnaligned64 ((UINT64 *)&Cdb[2], SwapBytes64 (StartLba));
-  WriteUnaligned32 ((UINT32 *)&Cdb[10], SwapBytes32 (SectorNum));
+  WriteUnaligned64 (&Cdb[2], SwapBytes64 (StartLba));
+  WriteUnaligned32 (&Cdb[10], SwapBytes32 (SectorNum));
 
   Packet.Timeout          = UFS_TIMEOUT;
   Packet.Cdb              = Cdb;

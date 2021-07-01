@@ -164,11 +164,11 @@ Tpm2SetPrimaryPolicy (
   //
   // Real data
   //
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(AuthPolicy->size));
+  WriteUnaligned16 (Buffer, SwapBytes16(AuthPolicy->size));
   Buffer += sizeof(UINT16);
   CopyMem (Buffer, AuthPolicy->buffer, AuthPolicy->size);
   Buffer += AuthPolicy->size;
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(HashAlg));
+  WriteUnaligned16 (Buffer, SwapBytes16(HashAlg));
   Buffer += sizeof(UINT16);
 
   SendBufferSize = (UINT32)((UINTN)Buffer - (UINTN)&SendBuffer);
@@ -432,7 +432,7 @@ Tpm2HierarchyChangeAuth (
   Cmd.AuthorizationSize = SwapBytes32(SessionInfoSize);
 
   // New Authorization size
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(NewAuth->size));
+  WriteUnaligned16 (Buffer, SwapBytes16(NewAuth->size));
   Buffer += sizeof(UINT16);
 
   // New Authorization
@@ -737,7 +737,7 @@ Tpm2HierarchyControl (
   Buffer += SessionInfoSize;
   Cmd.AuthorizationSize = SwapBytes32(SessionInfoSize);
 
-  WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32(Hierarchy));
+  WriteUnaligned32 (Buffer, SwapBytes32(Hierarchy));
   Buffer += sizeof(UINT32);
 
   *(UINT8 *)Buffer = State;

@@ -121,12 +121,12 @@ Tpm2PcrExtend (
   Cmd.AuthorizationSize = SwapBytes32(SessionInfoSize);
 
   //Digest Count
-  WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32(Digests->count));
+  WriteUnaligned32 (Buffer, SwapBytes32(Digests->count));
   Buffer += sizeof(UINT32);
 
   //Digest
   for (Index = 0; Index < Digests->count; Index++) {
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(Digests->digests[Index].hashAlg));
+    WriteUnaligned16 (Buffer, SwapBytes16(Digests->digests[Index].hashAlg));
     Buffer += sizeof(UINT16);
     DigestSize = GetHashSizeFromAlgo (Digests->digests[Index].hashAlg);
     if (DigestSize == 0) {
@@ -230,7 +230,7 @@ Tpm2PcrEvent (
   Cmd.AuthorizationSize = SwapBytes32(SessionInfoSize);
 
   // Event
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(EventData->size));
+  WriteUnaligned16 (Buffer, SwapBytes16(EventData->size));
   Buffer += sizeof(UINT16);
 
   CopyMem (Buffer, EventData->buffer, EventData->size);
@@ -272,7 +272,7 @@ Tpm2PcrEvent (
   //
   Buffer = (UINT8 *)&Res.Digests;
 
-  Digests->count = SwapBytes32 (ReadUnaligned32 ((UINT32 *)Buffer));
+  Digests->count = SwapBytes32 (ReadUnaligned32 (Buffer));
   if (Digests->count > HASH_COUNT) {
     DEBUG ((DEBUG_ERROR, "Tpm2PcrEvent - Digests->count error %x\n", Digests->count));
     return EFI_DEVICE_ERROR;
@@ -280,7 +280,7 @@ Tpm2PcrEvent (
 
   Buffer += sizeof(UINT32);
   for (Index = 0; Index < Digests->count; Index++) {
-    Digests->digests[Index].hashAlg = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
+    Digests->digests[Index].hashAlg = SwapBytes16 (ReadUnaligned16 (Buffer));
     Buffer += sizeof(UINT16);
     DigestSize = GetHashSizeFromAlgo (Digests->digests[Index].hashAlg);
     if (DigestSize == 0) {
@@ -482,10 +482,10 @@ Tpm2PcrAllocate (
   Cmd.AuthSessionSize = SwapBytes32(SessionInfoSize);
 
   // Count
-  WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32(PcrAllocation->count));
+  WriteUnaligned32 (Buffer, SwapBytes32(PcrAllocation->count));
   Buffer += sizeof(UINT32);
   for (Index = 0; Index < PcrAllocation->count; Index++) {
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(PcrAllocation->pcrSelections[Index].hash));
+    WriteUnaligned16 (Buffer, SwapBytes16(PcrAllocation->pcrSelections[Index].hash));
     Buffer += sizeof(UINT16);
     *(UINT8 *)Buffer = PcrAllocation->pcrSelections[Index].sizeofSelect;
     Buffer++;

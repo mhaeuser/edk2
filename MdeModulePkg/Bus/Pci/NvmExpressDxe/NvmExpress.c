@@ -681,7 +681,7 @@ ProcessAsyncTaskList (
   }
 
   if (HasNewItem) {
-    Data  = ReadUnaligned32 ((UINT32*)&Private->CqHdbl[QueueId]);
+    Data  = ReadUnaligned32 (&Private->CqHdbl[QueueId]);
     PciIo->Mem.Write (
                  PciIo,
                  EfiPciIoWidthUint32,

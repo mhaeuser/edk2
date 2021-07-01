@@ -781,8 +781,8 @@ HiiNewImage (
   } else {
     ImageBlocks->BlockType = EFI_HII_IIBT_IMAGE_24BIT;
   }
-  WriteUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) ImageBlocks)->Bitmap.Width, Image->Width);
-  WriteUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) ImageBlocks)->Bitmap.Height, Image->Height);
+  WriteUnaligned16 (&((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) ImageBlocks)->Bitmap.Width, Image->Width);
+  WriteUnaligned16 (&((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) ImageBlocks)->Bitmap.Height, Image->Height);
   CopyGopToRgbPixel (((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) ImageBlocks)->Bitmap.Bitmap, Image->Bitmap, (UINT32) Image->Width * Image->Height);
 
   //
@@ -1197,8 +1197,8 @@ HiiSetImage (
   } else {
     NewImageBlock->BlockType = EFI_HII_IIBT_IMAGE_24BIT;
   }
-  WriteUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) NewImageBlock)->Bitmap.Width, Image->Width);
-  WriteUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) NewImageBlock)->Bitmap.Height, Image->Height);
+  WriteUnaligned16 (&((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) NewImageBlock)->Bitmap.Width, Image->Width);
+  WriteUnaligned16 (&((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) NewImageBlock)->Bitmap.Height, Image->Height);
   CopyGopToRgbPixel (((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) NewImageBlock)->Bitmap.Bitmap,
                        Image->Bitmap, (UINT32) Image->Width * Image->Height);
 

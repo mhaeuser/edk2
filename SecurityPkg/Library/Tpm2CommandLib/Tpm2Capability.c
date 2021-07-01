@@ -340,7 +340,7 @@ Tpm2GetCapabilitySupportedAlg (
 
   for (Index = 0; Index < AlgList->count; Index++) {
     AlgList->algProperties[Index].alg = SwapBytes16 (AlgList->algProperties[Index].alg);
-    WriteUnaligned32 ((UINT32 *)&AlgList->algProperties[Index].algProperties, SwapBytes32 (ReadUnaligned32 ((UINT32 *)&AlgList->algProperties[Index].algProperties)));
+    WriteUnaligned32 (&AlgList->algProperties[Index].algProperties, SwapBytes32 (ReadUnaligned32 (&AlgList->algProperties[Index].algProperties)));
   }
 
   return EFI_SUCCESS;
@@ -696,44 +696,44 @@ Tpm2TestParms (
   SendBuffer.Header.commandCode = SwapBytes32(TPM_CC_TestParms);
 
   Buffer = (UINT8 *)&SendBuffer.Parameters;
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->type));
+  WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->type));
   Buffer += sizeof(UINT16);
   switch (Parameters->type) {
   case TPM_ALG_KEYEDHASH:
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.keyedHashDetail.scheme.scheme));
+    WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.keyedHashDetail.scheme.scheme));
     Buffer += sizeof(UINT16);
     switch (Parameters->parameters.keyedHashDetail.scheme.scheme) {
     case TPM_ALG_HMAC:
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.keyedHashDetail.scheme.details.hmac.hashAlg));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.keyedHashDetail.scheme.details.hmac.hashAlg));
       Buffer += sizeof(UINT16);
       break;
     case TPM_ALG_XOR:
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.keyedHashDetail.scheme.details.xor.hashAlg));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.keyedHashDetail.scheme.details.xor.hashAlg));
       Buffer += sizeof(UINT16);
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.keyedHashDetail.scheme.details.xor.kdf));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.keyedHashDetail.scheme.details.xor.kdf));
       Buffer += sizeof(UINT16);
       break;
     default:
       return EFI_INVALID_PARAMETER;
     }
   case TPM_ALG_SYMCIPHER:
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.symDetail.algorithm));
+    WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.symDetail.algorithm));
     Buffer += sizeof(UINT16);
     switch (Parameters->parameters.symDetail.algorithm) {
     case TPM_ALG_AES:
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.symDetail.keyBits.aes));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.symDetail.keyBits.aes));
       Buffer += sizeof(UINT16);
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.symDetail.mode.aes));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.symDetail.mode.aes));
       Buffer += sizeof(UINT16);
       break;
     case TPM_ALG_SM4:
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.symDetail.keyBits.SM4));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.symDetail.keyBits.SM4));
       Buffer += sizeof(UINT16);
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.symDetail.mode.SM4));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.symDetail.mode.SM4));
       Buffer += sizeof(UINT16);
       break;
     case TPM_ALG_XOR:
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.symDetail.keyBits.xor));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.symDetail.keyBits.xor));
       Buffer += sizeof(UINT16);
       break;
     case TPM_ALG_NULL:
@@ -743,19 +743,19 @@ Tpm2TestParms (
     }
     break;
   case TPM_ALG_RSA:
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.rsaDetail.symmetric.algorithm));
+    WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.rsaDetail.symmetric.algorithm));
     Buffer += sizeof(UINT16);
     switch (Parameters->parameters.rsaDetail.symmetric.algorithm) {
     case TPM_ALG_AES:
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.rsaDetail.symmetric.keyBits.aes));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.rsaDetail.symmetric.keyBits.aes));
       Buffer += sizeof(UINT16);
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.rsaDetail.symmetric.mode.aes));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.rsaDetail.symmetric.mode.aes));
       Buffer += sizeof(UINT16);
       break;
     case TPM_ALG_SM4:
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.rsaDetail.symmetric.keyBits.SM4));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.rsaDetail.symmetric.keyBits.SM4));
       Buffer += sizeof(UINT16);
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.rsaDetail.symmetric.mode.SM4));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.rsaDetail.symmetric.mode.SM4));
       Buffer += sizeof(UINT16);
       break;
     case TPM_ALG_NULL:
@@ -763,21 +763,21 @@ Tpm2TestParms (
     default:
       return EFI_INVALID_PARAMETER;
     }
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.rsaDetail.scheme.scheme));
+    WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.rsaDetail.scheme.scheme));
     Buffer += sizeof(UINT16);
     switch (Parameters->parameters.rsaDetail.scheme.scheme) {
     case TPM_ALG_RSASSA:
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.rsaDetail.scheme.details.rsassa.hashAlg));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.rsaDetail.scheme.details.rsassa.hashAlg));
       Buffer += sizeof(UINT16);
       break;
     case TPM_ALG_RSAPSS:
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.rsaDetail.scheme.details.rsapss.hashAlg));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.rsaDetail.scheme.details.rsapss.hashAlg));
       Buffer += sizeof(UINT16);
       break;
     case TPM_ALG_RSAES:
       break;
     case TPM_ALG_OAEP:
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.rsaDetail.scheme.details.oaep.hashAlg));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.rsaDetail.scheme.details.oaep.hashAlg));
       Buffer += sizeof(UINT16);
       break;
     case TPM_ALG_NULL:
@@ -785,25 +785,25 @@ Tpm2TestParms (
     default:
       return EFI_INVALID_PARAMETER;
     }
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.rsaDetail.keyBits));
+    WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.rsaDetail.keyBits));
     Buffer += sizeof(UINT16);
     WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32 (Parameters->parameters.rsaDetail.exponent));
     Buffer += sizeof(UINT32);
     break;
   case TPM_ALG_ECC:
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.eccDetail.symmetric.algorithm));
+    WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.eccDetail.symmetric.algorithm));
     Buffer += sizeof(UINT16);
     switch (Parameters->parameters.eccDetail.symmetric.algorithm) {
     case TPM_ALG_AES:
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.eccDetail.symmetric.keyBits.aes));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.eccDetail.symmetric.keyBits.aes));
       Buffer += sizeof(UINT16);
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.eccDetail.symmetric.mode.aes));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.eccDetail.symmetric.mode.aes));
       Buffer += sizeof(UINT16);
       break;
     case TPM_ALG_SM4:
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.eccDetail.symmetric.keyBits.SM4));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.eccDetail.symmetric.keyBits.SM4));
       Buffer += sizeof(UINT16);
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.eccDetail.symmetric.mode.SM4));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.eccDetail.symmetric.mode.SM4));
       Buffer += sizeof(UINT16);
       break;
     case TPM_ALG_NULL:
@@ -811,19 +811,19 @@ Tpm2TestParms (
     default:
       return EFI_INVALID_PARAMETER;
     }
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.eccDetail.scheme.scheme));
+    WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.eccDetail.scheme.scheme));
     Buffer += sizeof(UINT16);
     switch (Parameters->parameters.eccDetail.scheme.scheme) {
     case TPM_ALG_ECDSA:
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.eccDetail.scheme.details.ecdsa.hashAlg));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.eccDetail.scheme.details.ecdsa.hashAlg));
       Buffer += sizeof(UINT16);
       break;
     case TPM_ALG_ECDAA:
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.eccDetail.scheme.details.ecdaa.hashAlg));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.eccDetail.scheme.details.ecdaa.hashAlg));
       Buffer += sizeof(UINT16);
       break;
     case TPM_ALG_ECSCHNORR:
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.eccDetail.scheme.details.ecSchnorr.hashAlg));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.eccDetail.scheme.details.ecSchnorr.hashAlg));
       Buffer += sizeof(UINT16);
       break;
     case TPM_ALG_ECDH:
@@ -833,25 +833,25 @@ Tpm2TestParms (
     default:
       return EFI_INVALID_PARAMETER;
     }
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.eccDetail.curveID));
+    WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.eccDetail.curveID));
     Buffer += sizeof(UINT16);
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.eccDetail.kdf.scheme));
+    WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.eccDetail.kdf.scheme));
     Buffer += sizeof(UINT16);
     switch (Parameters->parameters.eccDetail.kdf.scheme) {
     case TPM_ALG_MGF1:
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.eccDetail.kdf.details.mgf1.hashAlg));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.eccDetail.kdf.details.mgf1.hashAlg));
       Buffer += sizeof(UINT16);
       break;
     case TPM_ALG_KDF1_SP800_108:
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.eccDetail.kdf.details.kdf1_sp800_108.hashAlg));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.eccDetail.kdf.details.kdf1_sp800_108.hashAlg));
       Buffer += sizeof(UINT16);
       break;
     case TPM_ALG_KDF1_SP800_56a:
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.eccDetail.kdf.details.kdf1_SP800_56a.hashAlg));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.eccDetail.kdf.details.kdf1_SP800_56a.hashAlg));
       Buffer += sizeof(UINT16);
       break;
     case TPM_ALG_KDF2:
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.eccDetail.kdf.details.kdf2.hashAlg));
+      WriteUnaligned16 (Buffer, SwapBytes16 (Parameters->parameters.eccDetail.kdf.details.kdf2.hashAlg));
       Buffer += sizeof(UINT16);
       break;
     case TPM_ALG_NULL:
