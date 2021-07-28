@@ -1090,6 +1090,7 @@ MigrateSecModulesInFv (
   UINT32                      FileSize;
   VOID                        *OrgPe32SectionData;
   VOID                        *Pe32SectionData;
+  UINT32                      Pe32SectionSize;
   EFI_FFS_FILE_HEADER         *FfsFileHeader;
   EFI_COMMON_SECTION_HEADER   *Section;
   BOOLEAN                     IsFfs3Fv;
@@ -1136,6 +1137,7 @@ MigrateSecModulesInFv (
                 Section,
                 FileSize,
                 &Pe32SectionData,
+                &Pe32SectionSize,
                 &SectionAuthenticationStatus,
                 IsFfs3Fv
                 );
