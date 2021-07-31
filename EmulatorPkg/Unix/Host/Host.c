@@ -48,9 +48,6 @@ EMU_SYSTEM_MEMORY  *gSystemMemory;
 
 
 
-UINTN                        mImageContextModHandleArraySize = 0;
-IMAGE_CONTEXT_TO_MOD_HANDLE  *mImageContextModHandleArray = NULL;
-
 EFI_PEI_PPI_DESCRIPTOR  *gPpiList;
 
 
@@ -118,8 +115,7 @@ main (
   SecGdbConfigBreak ();
 
   //
-  // If dlopen doesn't work, then we build a gdb script to allow the
-  // symbols to be loaded.
+  // We build a gdb script to allow the symbols to be loaded.
   //
   Index = strlen (*Argv);
   gGdbWorkingFileName = AllocatePool (Index + strlen(".gdb") + 1);
@@ -762,7 +758,6 @@ SecPeCoffGetEntryPoint (
     ImageContext.EntryPoint = (UINTN)*EntryPoint;
   }
 
-  // On Unix a dlopen is done that will change the entry point
   SecPeCoffRelocateImageExtraAction (&ImageContext);
   *EntryPoint = (VOID *)(UINTN)ImageContext.EntryPoint;
 
@@ -891,115 +886,6 @@ Returns:
 }
 
 
-/*++
-
-Routine Description:
-  Store the ModHandle in an array indexed by the Pdb File name.
-  The ModHandle is needed to unload the image.
-
-Arguments:
-  ImageContext - Input data returned from PE Loader Library. Used to find the
-                 .PDB file name of the PE Image.
-  ModHandle    - Returned from LoadLibraryEx() and stored for call to
-                 FreeLibrary().
-
-Returns:
-  EFI_SUCCESS - ModHandle was stored.
-
-**/
-EFI_STATUS
-AddHandle (
-  IN  PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext,
-  IN  VOID                                 *ModHandle
-  )
-{
-  UINTN                       Index;
-  IMAGE_CONTEXT_TO_MOD_HANDLE *Array;
-  UINTN                       PreviousSize;
-
-
-  Array = mImageContextModHandleArray;
-  for (Index = 0; Index < mImageContextModHandleArraySize; Index++, Array++) {
-    if (Array->ImageContext == NULL) {
-      //
-      // Make a copy of the string and store the ModHandle
-      //
-      Array->ImageContext = ImageContext;
-      Array->ModHandle    = ModHandle;
-      return EFI_SUCCESS;
-    }
-  }
-
-  //
-  // No free space in mImageContextModHandleArray so grow it by
-  // IMAGE_CONTEXT_TO_MOD_HANDLE entires. realloc will
-  // copy the old values to the new location. But it does
-  // not zero the new memory area.
-  //
-  PreviousSize = mImageContextModHandleArraySize * sizeof (IMAGE_CONTEXT_TO_MOD_HANDLE);
-  mImageContextModHandleArraySize += MAX_IMAGE_CONTEXT_TO_MOD_HANDLE_ARRAY_SIZE;
-
-  mImageContextModHandleArray = ReallocatePool (
-                                  (mImageContextModHandleArraySize - 1) * sizeof (IMAGE_CONTEXT_TO_MOD_HANDLE),
-                                  mImageContextModHandleArraySize * sizeof (IMAGE_CONTEXT_TO_MOD_HANDLE),
-                                  mImageContextModHandleArray
-                                  );
-  if (mImageContextModHandleArray == NULL) {
-    ASSERT (FALSE);
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  memset (mImageContextModHandleArray + PreviousSize, 0, MAX_IMAGE_CONTEXT_TO_MOD_HANDLE_ARRAY_SIZE * sizeof (IMAGE_CONTEXT_TO_MOD_HANDLE));
-
-  return AddHandle (ImageContext, ModHandle);
-}
-
-
-/*++
-
-Routine Description:
-  Return the ModHandle and delete the entry in the array.
-
-Arguments:
-  ImageContext - Input data returned from PE Loader Library. Used to find the
-                 .PDB file name of the PE Image.
-
-Returns:
-  ModHandle - ModHandle associated with ImageContext is returned
-  NULL      - No ModHandle associated with ImageContext
-
-**/
-VOID *
-RemoveHandle (
-  IN  PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
-  )
-{
-  UINTN                        Index;
-  IMAGE_CONTEXT_TO_MOD_HANDLE  *Array;
-
-  if (ImageContext->PdbPointer == NULL) {
-    //
-    // If no PDB pointer there is no ModHandle so return NULL
-    //
-    return NULL;
-  }
-
-  Array = mImageContextModHandleArray;
-  for (Index = 0; Index < mImageContextModHandleArraySize; Index++, Array++) {
-    if (Array->ImageContext == ImageContext) {
-      //
-      // If you find a match return it and delete the entry
-      //
-      Array->ImageContext = NULL;
-      return Array->ModHandle;
-    }
-  }
-
-  return NULL;
-}
-
-
-
 BOOLEAN
 IsPdbFile (
   IN  CHAR8   *PdbFileName
@@ -1049,67 +935,6 @@ PrintLoadAddress (
   }
   // Keep output synced up
   fflush (stderr);
-}
-
-
-/**
-  Loads the image using dlopen so symbols will be automatically
-  loaded by gdb.
-
-  @param  ImageContext  The PE/COFF image context
-
-  @retval TRUE - The image was successfully loaded
-  @retval FALSE - The image was successfully loaded
-
-**/
-BOOLEAN
-DlLoadImage (
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
-  )
-{
-
-#ifdef __APPLE__
-
-  return FALSE;
-
-#else
-
-  void        *Handle = NULL;
-  void        *Entry = NULL;
-
-  if (ImageContext->PdbPointer == NULL) {
-    return FALSE;
-  }
-
-  if (!IsPdbFile (ImageContext->PdbPointer)) {
-    return FALSE;
-  }
-
-  fprintf (
-     stderr,
-     "Loading %s 0x%08lx - entry point 0x%08lx\n",
-     ImageContext->PdbPointer,
-     (unsigned long)ImageContext->ImageAddress,
-     (unsigned long)ImageContext->EntryPoint
-     );
-
-  Handle = dlopen (ImageContext->PdbPointer, RTLD_NOW);
-  if (Handle != NULL) {
-    Entry = dlsym (Handle, "_ModuleEntryPoint");
-    AddHandle (ImageContext, Handle);
-  } else {
-    printf("%s\n", dlerror());
-  }
-
-  if (Entry != NULL) {
-    ImageContext->EntryPoint = (UINTN)Entry;
-    printf ("Change %s Entrypoint to :0x%08lx\n", ImageContext->PdbPointer, (unsigned long)Entry);
-    return TRUE;
-  } else {
-    return FALSE;
-  }
-
-#endif
 }
 
 
@@ -1195,9 +1020,7 @@ SecPeCoffRelocateImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
   )
 {
-  if (!DlLoadImage (ImageContext)) {
-    GdbScriptAddImage (ImageContext);
-  }
+  GdbScriptAddImage (ImageContext);
 }
 
 
@@ -1264,19 +1087,6 @@ SecPeCoffUnloadImageExtraAction (
   IN PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
   )
 {
-  VOID *Handle;
-
-  //
-  // Check to see if the image symbols were loaded with gdb script, or dlopen
-  //
-  Handle = RemoveHandle (ImageContext);
-  if (Handle != NULL) {
-#ifndef __APPLE__
-    dlclose (Handle);
-#endif
-    return;
-  }
-
   GdbScriptRemoveImage (ImageContext);
 }
 
