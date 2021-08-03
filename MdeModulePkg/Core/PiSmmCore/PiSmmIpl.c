@@ -979,7 +979,8 @@ GetPeCoffImageFixLoadingAssignedAddress(
          //
          FixLoadingAddress = (EFI_PHYSICAL_ADDRESS)(SmramBase + (INT64)ValueInSectionHeader);
 
-         if (SmramBase + SmmCodeSize > FixLoadingAddress && SmramBase <=  FixLoadingAddress) {
+         if (ValueInSectionHeader < SmmCodeSize
+          && (UINTN)(ImageContext->ImageSize + ImageContext->SectionAlignment) <= SmmCodeSize - ValueInSectionHeader) {
            //
            // The assigned address is valid. Return the specified loading address
            //
