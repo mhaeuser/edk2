@@ -416,6 +416,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
    EFI_STATUS                         Status;
    EFI_IMAGE_SECTION_HEADER           SectionHeader;
    EFI_IMAGE_OPTIONAL_HEADER_UNION    *ImgHdr;
+   EFI_PHYSICAL_ADDRESS               FixLoadingAddress;
    UINT16                             Index;
    UINTN                              Size;
    UINT16                             NumberOfSections;
@@ -468,24 +469,35 @@ GetPeCoffImageFixLoadingAssignedAddress(
        //
        ValueInSectionHeader = ReadUnaligned64((UINT64*)&SectionHeader.PointerToRelocations);
        if (ValueInSectionHeader != 0) {
-         //
-         // When the feature is configured as load module at fixed absolute address, the ImageAddress field of ImageContext
-         // hold the specified address. If the feature is configured as load module at fixed offset, ImageAddress hold an offset
-         // relative to top address
-         //
-         if ((INT64)PcdGet64(PcdLoadModuleAtFixAddressEnable) < 0) {
-            ImageContext->ImageAddress = gLoadModuleAtFixAddressConfigurationTable.DxeCodeTopAddress + (INT64)(INTN)ImageContext->ImageAddress;
+          if ((INT64)PcdGet64(PcdLoadModuleAtFixAddressEnable) > 0) {
+           //
+           // When LMFA feature is configured as Load Module at Fixed Absolute Address mode, PointerToRelocations & PointerToLineNumbers field
+           // hold the absolute address of image base running in memory
+           //
+           FixLoadingAddress = ValueInSectionHeader;
+         } else {
+           //
+           // When LMFA feature is configured as Load Module at Fixed offset mode, PointerToRelocations & PointerToLineNumbers field
+           // hold the offset relative to a platform-specific top address.
+           //
+           FixLoadingAddress = gLoadModuleAtFixAddressConfigurationTable.DxeCodeTopAddress + ValueInSectionHeader;
          }
          //
          // Check if the memory range is available.
          //
-         Status = CheckAndMarkFixLoadingMemoryUsageBitMap (ImageContext->ImageAddress, (UINTN)(ImageContext->ImageSize + ImageContext->SectionAlignment));
+         Status = CheckAndMarkFixLoadingMemoryUsageBitMap (FixLoadingAddress, (UINTN)(ImageContext->ImageSize + ImageContext->SectionAlignment));
+         if (!EFI_ERROR(Status)) {
+           //
+           // The assigned address is valid. Return the specified loading address
+           //
+           ImageContext->ImageAddress = FixLoadingAddress;
+         }
        }
        break;
      }
      SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
    }
-   DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address 0x%11p. Status = %r \n", (VOID *)(UINTN)(ImageContext->ImageAddress), Status));
+   DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address 0x%11p. Status = %r \n", (VOID *)(UINTN)FixLoadingAddress, Status));
    return Status;
 }
 
