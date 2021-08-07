@@ -145,15 +145,6 @@ typedef struct {
 } IMAGE_CONTEXT_TO_MOD_HANDLE;
 
 
-EFI_STATUS
-EFIAPI
-SecUnixPeiLoadFile (
-  VOID                  *Pe32Data,
-  EFI_PHYSICAL_ADDRESS  *ImageAddress,
-  UINT64                *ImageSize,
-  EFI_PHYSICAL_ADDRESS  *EntryPoint
-  );
-
 int
 main (
   IN  int   Argc,
@@ -167,48 +158,6 @@ SecLoadFromCore (
   IN  UINTN   LargestRegionSize,
   IN  UINTN   BootFirmwareVolumeBase,
   IN  VOID    *PeiCoreFile
-  );
-
-EFI_STATUS
-SecLoadFile (
-  IN  VOID                    *Pe32Data,
-  IN  EFI_PHYSICAL_ADDRESS    *ImageAddress,
-  IN  UINT64                  *ImageSize,
-  IN  EFI_PHYSICAL_ADDRESS    *EntryPoint
-  );
-
-EFI_STATUS
-SecFfsFindPeiCore (
-  IN  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader,
-  OUT VOID                        **Pe32Data
-  );
-
-EFI_STATUS
-SecFfsFindNextFile (
-  IN EFI_FV_FILETYPE             SearchType,
-  IN EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader,
-  IN OUT EFI_FFS_FILE_HEADER     **FileHeader
-  );
-
-EFI_STATUS
-SecFfsFindSectionData (
-  IN EFI_SECTION_TYPE      SectionType,
-  IN EFI_FFS_FILE_HEADER   *FfsFileHeader,
-  IN OUT VOID              **SectionData
-  );
-
-EFI_STATUS
-EFIAPI
-SecUnixPeCoffLoaderLoadAsDll (
-  IN CHAR8    *PdbFileName,
-  IN VOID     **ImageEntryPoint,
-  OUT VOID    **ModHandle
-  );
-
-EFI_STATUS
-EFIAPI
-SecUnixPeCoffLoaderFreeLibrary (
-  OUT VOID    *ModHandle
   );
 
 EFI_STATUS
@@ -232,12 +181,6 @@ GasketSecUnixFdAddress (
 
 
 EFI_STATUS
-GetImageReadFunction (
-  IN PE_COFF_LOADER_IMAGE_CONTEXT          *ImageContext,
-  IN EFI_PHYSICAL_ADDRESS                  *TopOfMemory
-  );
-
-EFI_STATUS
 EFIAPI
 SecImageRead (
   IN     VOID    *FileHandle,
@@ -246,34 +189,10 @@ SecImageRead (
   OUT    VOID    *Buffer
   );
 
-CHAR16                            *
-AsciiToUnicode (
-  IN  CHAR8   *Ascii,
-  IN  UINTN   *StrLen OPTIONAL
-  );
-
 UINTN
 CountSeparatorsInString (
   IN  const CHAR16   *String,
   IN  CHAR16   Separator
-  );
-
-EFI_STATUS
-EFIAPI
-SecTemporaryRamSupport (
-  IN CONST EFI_PEI_SERVICES   **PeiServices,
-  IN EFI_PHYSICAL_ADDRESS     TemporaryMemoryBase,
-  IN EFI_PHYSICAL_ADDRESS     PermanentMemoryBase,
-  IN UINTN                    CopySize
-  );
-
-EFI_STATUS
-EFIAPI
-GasketSecTemporaryRamSupport (
-  IN CONST EFI_PEI_SERVICES   **PeiServices,
-  IN EFI_PHYSICAL_ADDRESS     TemporaryMemoryBase,
-  IN EFI_PHYSICAL_ADDRESS     PermanentMemoryBase,
-  IN UINTN                    CopySize
   );
 
 
@@ -287,12 +206,6 @@ SecPeCoffGetEntryPoint (
 VOID
 EFIAPI
 SecPeCoffRelocateImageExtraAction (
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
-  );
-
-VOID
-EFIAPI
-SecPeCoffLoaderUnloadImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   );
 
