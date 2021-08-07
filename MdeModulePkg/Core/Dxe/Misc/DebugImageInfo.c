@@ -165,10 +165,11 @@ CoreNewDebugImageInfoEntry (
   IN  EFI_HANDLE                  ImageHandle
   )
 {
-  EFI_DEBUG_IMAGE_INFO      *Table;
-  EFI_DEBUG_IMAGE_INFO      *NewTable;
-  UINTN                     Index;
-  UINTN                     TableSize;
+  EFI_DEBUG_IMAGE_INFO        *Table;
+  EFI_DEBUG_IMAGE_INFO        *NewTable;
+  UINTN                       Index;
+  UINTN                       TableSize;
+  EFI_DEBUG_IMAGE_INFO_NORMAL *NormalImage;
 
   //
   // Set the flag indicating that we're in the process of updating the table.
@@ -203,6 +204,13 @@ CoreNewDebugImageInfoEntry (
     // Copy the old table into the new one
     //
     CopyMem (NewTable, Table, TableSize);
+    mDebugInfoTableHeader.EfiDebugImageInfoTable = NewTable;
+    //
+    // Enlarge the max table entries and set the first empty entry index to
+    // be the original max table entries.
+    //
+    Index             = mMaxTableEntries;
+    mMaxTableEntries += EFI_PAGE_SIZE / EFI_DEBUG_TABLE_ENTRY_SIZE;
     //
     // Free the old table
     //
@@ -211,31 +219,26 @@ CoreNewDebugImageInfoEntry (
     // Update the table header
     //
     Table = NewTable;
-    mDebugInfoTableHeader.EfiDebugImageInfoTable = NewTable;
-    //
-    // Enlarge the max table entries and set the first empty entry index to
-    // be the original max table entries.
-    //
-    Index             = mMaxTableEntries;
-    mMaxTableEntries += EFI_PAGE_SIZE / EFI_DEBUG_TABLE_ENTRY_SIZE;
   }
 
   //
   // Allocate data for new entry
   //
-  Table[Index].NormalImage = AllocateZeroPool (sizeof (EFI_DEBUG_IMAGE_INFO_NORMAL));
-  if (Table[Index].NormalImage != NULL) {
+  NormalImage = AllocateZeroPool (sizeof (EFI_DEBUG_IMAGE_INFO_NORMAL));
+  if (NormalImage != NULL) {
     //
     // Update the entry
     //
-    Table[Index].NormalImage->ImageInfoType               = (UINT32) ImageInfoType;
-    Table[Index].NormalImage->LoadedImageProtocolInstance = LoadedImage;
-    Table[Index].NormalImage->ImageHandle                 = ImageHandle;
+    NormalImage->ImageInfoType               = (UINT32) ImageInfoType;
+    NormalImage->LoadedImageProtocolInstance = LoadedImage;
+    NormalImage->ImageHandle                 = ImageHandle;
     //
-    // Increase the number of EFI_DEBUG_IMAGE_INFO elements and set the mDebugInfoTable in modified status.
+    // Set the mDebugInfoTable in modified status, insert the entry, and
+    // increase the number of EFI_DEBUG_IMAGE_INFO elements.
     //
-    mDebugInfoTableHeader.TableSize++;
     mDebugInfoTableHeader.UpdateStatus |= EFI_DEBUG_IMAGE_INFO_TABLE_MODIFIED;
+    Table[Index].NormalImage = NormalImage;
+    mDebugInfoTableHeader.TableSize++;
   }
   mDebugInfoTableHeader.UpdateStatus &= ~EFI_DEBUG_IMAGE_INFO_UPDATE_IN_PROGRESS;
 }
@@ -253,8 +256,9 @@ CoreRemoveDebugImageInfoEntry (
   EFI_HANDLE ImageHandle
   )
 {
-  EFI_DEBUG_IMAGE_INFO  *Table;
-  UINTN                 Index;
+  EFI_DEBUG_IMAGE_INFO        *Table;
+  UINTN                       Index;
+  EFI_DEBUG_IMAGE_INFO_NORMAL *NormalImage;
 
   mDebugInfoTableHeader.UpdateStatus |= EFI_DEBUG_IMAGE_INFO_UPDATE_IN_PROGRESS;
 
@@ -263,16 +267,20 @@ CoreRemoveDebugImageInfoEntry (
   for (Index = 0; Index < mMaxTableEntries; Index++) {
     if (Table[Index].NormalImage != NULL && Table[Index].NormalImage->ImageHandle == ImageHandle) {
       //
-      // Found a match. Free up the record, then NULL the pointer to indicate the slot
-      // is free.
+      // Found a match. Set the mDebugInfoTable in modified status and NULL the
+      // pointer to indicate the slot is free and.
       //
-      CoreFreePool (Table[Index].NormalImage);
+      NormalImage = Table[Index].NormalImage;
+      mDebugInfoTableHeader.UpdateStatus |= EFI_DEBUG_IMAGE_INFO_TABLE_MODIFIED;
       Table[Index].NormalImage = NULL;
       //
-      // Decrease the number of EFI_DEBUG_IMAGE_INFO elements and set the mDebugInfoTable in modified status.
+      // Decrease the number of EFI_DEBUG_IMAGE_INFO elements.
       //
       mDebugInfoTableHeader.TableSize--;
-      mDebugInfoTableHeader.UpdateStatus |= EFI_DEBUG_IMAGE_INFO_TABLE_MODIFIED;
+      //
+      // Free up the record.
+      //
+      CoreFreePool (NormalImage);
       break;
     }
   }
