@@ -6,7 +6,7 @@
 ;*
 ;------------------------------------------------------------------------------
 
-    SECTION .rodata
+    SECTION RODATA_SECTION_NAME
 
 ;
 ; Float control word initial value:
