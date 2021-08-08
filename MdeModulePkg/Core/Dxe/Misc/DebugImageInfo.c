@@ -173,6 +173,8 @@ CoreNewDebugImageInfoEntry (
   UINTN                       TableSize;
   EFI_DEBUG_IMAGE_INFO_NORMAL *NormalImage;
 
+  ASSERT (LoadedImage != NULL);
+
   //
   // Set the flag indicating that we're in the process of updating the table.
   //
