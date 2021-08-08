@@ -52,8 +52,9 @@ GetImageName (
   Address = (CHAR8 *)(UINTN)FaultAddress;
   for (Entry = 0; Entry < DebugTableHeader->TableSize; Entry++, DebugTable++) {
     if (DebugTable->ImageInfoType != NULL) {
-      if ((*DebugTable->ImageInfoType == EFI_DEBUG_IMAGE_INFO_TYPE_NORMAL) &&
-          (DebugTable->NormalImage->LoadedImageProtocolInstance != NULL)) {
+      if (*DebugTable->ImageInfoType == EFI_DEBUG_IMAGE_INFO_TYPE_NORMAL) {
+        ASSERT (gDebugTable->NormalImage->LoadedImageProtocolInstance != NULL);
+
         if ((Address >= (CHAR8 *)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase) &&
             (Address <= ((CHAR8 *)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase + DebugTable->NormalImage->LoadedImageProtocolInstance->ImageSize))) {
           *ImageBase = (UINTN)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase;
