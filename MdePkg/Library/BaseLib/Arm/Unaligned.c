@@ -59,7 +59,7 @@ ReadUnaligned16 (
 UINT16
 EFIAPI
 WriteUnaligned16 (
-  OUT UINT16                    *Buffer,
+  OUT VOID                      *Buffer,
   IN  UINT16                    Value
   )
 {
@@ -87,7 +87,7 @@ WriteUnaligned16 (
 UINT32
 EFIAPI
 ReadUnaligned24 (
-  IN CONST UINT32              *Buffer
+  IN CONST VOID                *Buffer
   )
 {
   ASSERT (Buffer != NULL);
@@ -116,7 +116,7 @@ ReadUnaligned24 (
 UINT32
 EFIAPI
 WriteUnaligned24 (
-  OUT UINT32                    *Buffer,
+  OUT VOID                      *Buffer,
   IN  UINT32                    Value
   )
 {
@@ -143,7 +143,7 @@ WriteUnaligned24 (
 UINT32
 EFIAPI
 ReadUnaligned32 (
-  IN CONST UINT32              *Buffer
+  IN CONST VOID                *Buffer
   )
 {
   UINT16  LowerBytes;
@@ -175,7 +175,7 @@ ReadUnaligned32 (
 UINT32
 EFIAPI
 WriteUnaligned32 (
-  OUT UINT32                    *Buffer,
+  OUT VOID                      *Buffer,
   IN  UINT32                    Value
   )
 {
@@ -202,7 +202,7 @@ WriteUnaligned32 (
 UINT64
 EFIAPI
 ReadUnaligned64 (
-  IN CONST UINT64              *Buffer
+  IN CONST VOID                *Buffer
   )
 {
   UINT32  LowerBytes;
@@ -234,7 +234,7 @@ ReadUnaligned64 (
 UINT64
 EFIAPI
 WriteUnaligned64 (
-  OUT UINT64                    *Buffer,
+  OUT VOID                      *Buffer,
   IN  UINT64                    Value
   )
 {
