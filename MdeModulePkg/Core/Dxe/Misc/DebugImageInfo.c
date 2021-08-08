@@ -18,6 +18,8 @@ EFI_DEBUG_IMAGE_INFO_TABLE_HEADER  mDebugInfoTableHeader = {
 
 UINTN mMaxTableEntries = 0;
 
+UINTN mUsedTableEntries = 0;
+
 EFI_SYSTEM_TABLE_POINTER  *mDebugTable = NULL;
 
 #define EFI_DEBUG_TABLE_ENTRY_SIZE       (sizeof (VOID *))
@@ -178,7 +180,7 @@ CoreNewDebugImageInfoEntry (
 
   Table = mDebugInfoTableHeader.EfiDebugImageInfoTable;
 
-  if (mDebugInfoTableHeader.TableSize < mMaxTableEntries) {
+  if (mUsedTableEntries < mMaxTableEntries) {
     //
     // We still have empty entires in the Table, find the first empty entry.
     //
@@ -237,8 +239,17 @@ CoreNewDebugImageInfoEntry (
     // increase the number of EFI_DEBUG_IMAGE_INFO elements.
     //
     mDebugInfoTableHeader.UpdateStatus |= EFI_DEBUG_IMAGE_INFO_TABLE_MODIFIED;
+    mUsedTableEntries++;
     Table[Index].NormalImage = NormalImage;
-    mDebugInfoTableHeader.TableSize++;
+    //
+    // Only increase the amount of elements in the table if the new entry did
+    // not take the place of a previously removed entry.
+    //
+    if (Index == mDebugInfoTableHeader.TableSize) {
+      mDebugInfoTableHeader.TableSize++;
+    }
+
+    ASSERT (Index < mDebugInfoTableHeader.TableSize);
   }
   mDebugInfoTableHeader.UpdateStatus &= ~EFI_DEBUG_IMAGE_INFO_UPDATE_IN_PROGRESS;
 }
@@ -274,9 +285,10 @@ CoreRemoveDebugImageInfoEntry (
       mDebugInfoTableHeader.UpdateStatus |= EFI_DEBUG_IMAGE_INFO_TABLE_MODIFIED;
       Table[Index].NormalImage = NULL;
       //
-      // Decrease the number of EFI_DEBUG_IMAGE_INFO elements.
+      // Do not reduce the amount of elements reported to be in the table as
+      // this would only work for the last element without defragmentation.
       //
-      mDebugInfoTableHeader.TableSize--;
+      mUsedTableEntries--;
       //
       // Free up the record.
       //
