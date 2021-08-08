@@ -238,13 +238,13 @@ CopyGuid (
 
 UINT64
 WriteUnaligned64 (
-   UINT64                    *Buffer,
+   VOID                      *Buffer,
    UINT64                    Value
   );
 
 UINT64
 ReadUnaligned64 (
-   CONST UINT64              *Buffer
+   CONST VOID                *Buffer
   );
 
 UINTN
@@ -363,13 +363,13 @@ AllocatePool (
 
 UINT16
 WriteUnaligned16 (
-  UINT16                    *Buffer,
+  VOID                      *Buffer,
   UINT16                    Value
   );
 
 UINT16
 ReadUnaligned16 (
-  CONST UINT16              *Buffer
+  CONST VOID                *Buffer
   );
 
 VOID *

@@ -1154,23 +1154,23 @@ StrSize (
 
 UINT64
 ReadUnaligned64 (
-   CONST UINT64              *Buffer
+   CONST VOID                *Buffer
   )
 {
   ASSERT (Buffer != NULL);
 
-  return *Buffer;
+  return *(CONST UINT64 *) Buffer;
 }
 
 UINT64
 WriteUnaligned64 (
-   UINT64                    *Buffer,
+   VOID                      *Buffer,
    UINT64                    Value
   )
 {
   ASSERT (Buffer != NULL);
 
-  return *Buffer = Value;
+  return *(UINT64 *) Buffer = Value;
 }
 
 
@@ -2018,23 +2018,23 @@ AllocatePool (
 
 UINT16
 WriteUnaligned16 (
-  UINT16                    *Buffer,
+  VOID                      *Buffer,
   UINT16                    Value
   )
 {
   ASSERT (Buffer != NULL);
 
-  return *Buffer = Value;
+  return *(UINT16 *) Buffer = Value;
 }
 
 UINT16
 ReadUnaligned16 (
-  CONST UINT16              *Buffer
+  CONST VOID                *Buffer
   )
 {
   ASSERT (Buffer != NULL);
 
-  return *Buffer;
+  return *(CONST UINT16 *) Buffer;
 }
 /**
   Return whether the integer string is a hex string.
