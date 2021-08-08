@@ -24,7 +24,6 @@
 [Sources]
   UefiPayloadEntry.c
   LoadDxeCore.c
-  MemoryAllocation.c
 
 [Sources.Ia32]
   X64/VirtualMemory.h
@@ -56,6 +55,7 @@
   PeCoffLib
   PlatformSupportLib
   UefiCpuLib
+  MemoryAllocationLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid
