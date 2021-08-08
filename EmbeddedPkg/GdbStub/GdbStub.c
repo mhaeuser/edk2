@@ -1043,8 +1043,8 @@ QxferLibrary (
 
   if (gDebugTable != NULL) {
     for (; gEfiDebugImageTableEntry < gDebugImageTableHeader->TableSize; gEfiDebugImageTableEntry++, gDebugTable++) {
-      if (gDebugTable->NormalImage != NULL) {
-        if ((gDebugTable->NormalImage->ImageInfoType == EFI_DEBUG_IMAGE_INFO_TYPE_NORMAL) &&
+      if (gDebugTable->ImageInfoType != NULL) {
+        if ((*gDebugTable->ImageInfoType == EFI_DEBUG_IMAGE_INFO_TYPE_NORMAL) &&
             (gDebugTable->NormalImage->LoadedImageProtocolInstance != NULL)) {
           Pdb = PeCoffLoaderGetDebuggerInfo (
                  gDebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase,
