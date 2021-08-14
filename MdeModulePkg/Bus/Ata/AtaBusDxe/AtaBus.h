@@ -73,10 +73,9 @@
 //
 #define MAX_MODEL_NAME_LEN  40
 
-#define ATA_TASK_SIGNATURE               SIGNATURE_32 ('A', 'T', 'S', 'K')
-#define ATA_DEVICE_SIGNATURE             SIGNATURE_32 ('A', 'B', 'I', 'D')
-#define ATA_SUB_TASK_SIGNATURE           SIGNATURE_32 ('A', 'S', 'T', 'S')
-#define ADDRESS_IS_ALIGNED_(addr, size)  (((UINTN) (addr) & (size - 1)) == 0)
+#define ATA_TASK_SIGNATURE      SIGNATURE_32 ('A', 'T', 'S', 'K')
+#define ATA_DEVICE_SIGNATURE    SIGNATURE_32 ('A', 'B', 'I', 'D')
+#define ATA_SUB_TASK_SIGNATURE  SIGNATURE_32 ('A', 'S', 'T', 'S')
 
 //
 // ATA bus data structure for ATA controller
