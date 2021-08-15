@@ -1,0 +1,195 @@
+name: CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch'
+        required: true
+        default: 'master'
+
+jobs:
+  build-macos:
+    name: Build macOS XCODE5
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Checkout submodules
+        run: git submodule update --init
+
+      - name: Install Dependencies
+        env:
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
+          HOMEBREW_NO_AUTO_UPDATE: 1
+        run: |
+          pushd /tmp >/dev/null || exit 1
+          rm -rf nasm-mac64.zip
+          curl -OL "https://github.com/acidanthera/ocbuild/raw/master/external/nasm-mac64.zip" || exit 1
+          nasmzip=$(cat nasm-mac64.zip)
+          rm -rf nasm-*
+          curl -OL "https://github.com/acidanthera/ocbuild/raw/master/external/${nasmzip}" || exit 1
+          unzip -q "${nasmzip}" nasm*/nasm nasm*/ndisasm || exit 1
+          sudo mkdir -p /usr/local/bin || exit 1
+          sudo mv nasm*/nasm /usr/local/bin/ || exit 1
+          sudo mv nasm*/ndisasm /usr/local/bin/ || exit 1
+          rm -rf "${nasmzip}" nasm-*
+          popd >/dev/null || exit 1
+
+          pushd /tmp >/dev/null || exit 1
+          rm -rf iasl-macosx.zip
+          curl -OL "https://github.com/acidanthera/ocbuild/raw/master/external/iasl-macosx.zip" || exit 1
+          iaslzip=$(cat iasl-macosx.zip)
+          rm -rf iasl
+          curl -OL "https://github.com/acidanthera/ocbuild/raw/master/external/${iaslzip}" || exit 1
+          unzip -q "${iaslzip}" iasl || exit 1
+          sudo mkdir -p /usr/local/bin || exit 1
+          sudo mv iasl /usr/local/bin/ || exit 1
+          rm -rf "${iaslzip}" iasl
+          popd >/dev/null || exit 1
+          
+          pushd /tmp >/dev/null || exit 1
+          rm -f mtoc mtoc-mac64.zip
+          curl -OL "https://github.com/acidanthera/ocbuild/raw/master/external/mtoc-mac64.zip" || exit 1
+          mtoczip=$(cat mtoc-mac64.zip)
+          rm -rf mtoc-*
+          curl -OL "https://github.com/acidanthera/ocbuild/raw/master/external/${mtoczip}" || exit 1
+          unzip -q "${mtoczip}" mtoc || exit 1
+          sudo mkdir -p /usr/local/bin || exit 1
+          sudo rm -f /usr/local/bin/mtoc /usr/local/bin/mtoc.NEW || exit 1
+          sudo cp mtoc /usr/local/bin/mtoc || exit 1
+          popd >/dev/null || exit 1
+
+      - name: Setting up workspace
+        run: . edksetup.sh && make -C BaseTools
+        
+      - name: Building MdePkg
+        run: . edksetup.sh && build -p MdePkg/MdePkg.dsc -a IA32 -a X64 -b DEBUG -b NOOPT -b RELEASE -t XCODE5
+        
+      - name: Building MdeModulePkg
+        run: . edksetup.sh && build -p MdeModulePkg/MdeModulePkg.dsc -a IA32 -a X64 -b DEBUG -b NOOPT -b RELEASE -t XCODE5
+
+  build-linux-clangpdb:
+    name: Build Linux CLANGPDB
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Checkout submodules
+        run: git submodule update --init
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install nasm uuid-dev libssl-dev iasl
+          file="clang+llvm-9.0.1-x86_64-linux-gnu-ubuntu-16.04"
+          suf=".tar.xz"
+          curl -LO "https://github.com/llvm/llvm-project/releases/download/llvmorg-9.0.1/${file}${suf}" || exit 1
+          sum=$(shasum -a 256 "${file}${suf}" | cut -f1 -d' ')
+          expsum="1af280e96fec62acf5f3bb525e36baafe09f95f940dc9806e22809a83dfff4f8"
+          if [ "$sum" != "$expsum" ]; then echo "Invalid checksum $sum" ; exit 1 ; fi
+          tar -xf "${file}${suf}" || exit 1
+          echo "$(pwd)/${file}/bin" >> $GITHUB_PATH
+
+      - name: Setting up workspace
+        run: . edksetup.sh && make -C BaseTools
+
+      - name: Building MdePkg
+        run: . edksetup.sh && build -p MdePkg/MdePkg.dsc -a IA32 -a X64 -b DEBUG -b NOOPT -b RELEASE -t CLANGPDB
+        
+      - name: Building MdeModulePkg
+        run: . edksetup.sh && build -p MdeModulePkg/MdeModulePkg.dsc -a IA32 -a X64 -b DEBUG -b NOOPT -b RELEASE -t CLANGPDB
+
+  build-linux-gcc5:
+    name: Build Linux GCC5
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Checkout submodules
+        run: git submodule update --init
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install nasm uuid-dev libssl-dev iasl
+          file="clang+llvm-9.0.1-x86_64-linux-gnu-ubuntu-16.04"
+          suf=".tar.xz"
+          curl -LO "https://github.com/llvm/llvm-project/releases/download/llvmorg-9.0.1/${file}${suf}" || exit 1
+          sum=$(shasum -a 256 "${file}${suf}" | cut -f1 -d' ')
+          expsum="1af280e96fec62acf5f3bb525e36baafe09f95f940dc9806e22809a83dfff4f8"
+          if [ "$sum" != "$expsum" ]; then echo "Invalid checksum $sum" ; exit 1 ; fi
+          tar -xf "${file}${suf}" || exit 1
+          echo "$(pwd)/${file}/bin" >> $GITHUB_PATH
+
+      - name: Setting up workspace
+        run: . edksetup.sh && make -C BaseTools
+
+      - name: Building MdePkg
+        run: . edksetup.sh && build -p MdePkg/MdePkg.dsc -a IA32 -a X64 -b DEBUG -b NOOPT -b RELEASE -t GCC5
+        
+      - name: Building MdeModulePkg
+        run: . edksetup.sh && build -p MdeModulePkg/MdeModulePkg.dsc -a IA32 -a X64 -b DEBUG -b NOOPT -b RELEASE -t GCC5
+
+  build-linux-clang38:
+    name: Build Linux CLANG38
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Checkout submodules
+        run: git submodule update --init
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install nasm uuid-dev iasl clang-8 llvm-8-dev doxygen texlive texlive-latex-extra
+          echo "/usr/lib/llvm-8/bin" >> $GITHUB_PATH
+
+      - name: Setting up workspace
+        run: . edksetup.sh && make -C BaseTools
+
+      - name: Building MdePkg
+        run: . edksetup.sh && build -p MdePkg/MdePkg.dsc -a IA32 -a X64 -b DEBUG -b NOOPT -b RELEASE -t CLANG38
+        
+      - name: Building MdeModulePkg
+        run: . edksetup.sh && build -p MdeModulePkg/MdeModulePkg.dsc -a IA32 -a X64 -b DEBUG -b NOOPT -b RELEASE -t CLANG38
+
+  build-windows-vs2019:
+    name: Build Windows VS2019
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: cmd
+    env:
+      NASM_PREFIX: 'C:\Program Files\NASM\'
+      IASL_PREFIX: 'C:\tools\ASL\'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Checkout submodules
+        run: git submodule update --init
+
+      - name: Install Dependencies
+        run: |
+          choco install make nasm zip --no-progress || exit /b 1
+          choco install iasl --no-progress --version=2017.11.10 || exit /b 1
+
+      - name: Setting up workspace
+        run: edksetup.bat && cd BaseTools && nmake && cd ..
+
+      - name: Building MdePkg
+        run: edksetup.bat && build -p MdePkg/MdePkg.dsc -a IA32 -a X64 -b DEBUG -b NOOPT -b RELEASE -t VS2019
+        
+      - name: Building MdeModulePkg
+        run: edksetup.bat && build -p MdeModulePkg/MdeModulePkg.dsc -a IA32 -a X64 -b DEBUG -b NOOPT -b RELEASE -t VS2019
