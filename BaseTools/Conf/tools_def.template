@@ -1874,7 +1874,7 @@ DEFINE GCC_ARM_CC_XIPFLAGS         = -mno-unaligned-access
 DEFINE GCC_AARCH64_CC_FLAGS        = DEF(GCC_ALL_CC_FLAGS) -mlittle-endian -fno-short-enums -fverbose-asm -funsigned-char  -ffunction-sections -fdata-sections -Wno-address -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-pic -fno-pie -ffixed-x18
 DEFINE GCC_AARCH64_CC_XIPFLAGS     = -mstrict-align -mgeneral-regs-only
 DEFINE GCC_DLINK_FLAGS_COMMON      = -nostdlib --pie
-DEFINE GCC_DLINK2_FLAGS_COMMON     = -Wl,--script=$(EDK_TOOLS_PATH)/Scripts/GccBase.lds
+DEFINE GCC_DLINK2_FLAGS_COMMON     = -Wl,-L$(EDK_TOOLS_PATH)/Scripts/ -Wl,-L$(EDK_TOOLS_PATH)/Scripts/ -Wl,--default-script=$(EDK_TOOLS_PATH)/Scripts/GccEmitRdata.lds
 DEFINE GCC_IA32_X64_DLINK_COMMON   = DEF(GCC_DLINK_FLAGS_COMMON) --gc-sections
 DEFINE GCC_ARM_AARCH64_DLINK_COMMON= -Wl,--emit-relocs -nostdlib -Wl,--gc-sections -u $(IMAGE_ENTRY_POINT) -Wl,-e,$(IMAGE_ENTRY_POINT),-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map
 DEFINE GCC_ARM_DLINK_FLAGS         = DEF(GCC_ARM_AARCH64_DLINK_COMMON) -z common-page-size=0x20 -z max-page-size=0x20 -Wl,--pic-veneer
@@ -1906,9 +1906,9 @@ DEFINE GCC48_IA32_CC_FLAGS           = DEF(GCC48_ALL_CC_FLAGS) -m32 -march=i586 
 DEFINE GCC48_X64_CC_FLAGS            = DEF(GCC48_ALL_CC_FLAGS) -m64 -fno-stack-protector "-DEFIAPI=__attribute__((ms_abi))" -maccumulate-outgoing-args -mno-red-zone -Wno-address -mcmodel=small -fpie -fno-asynchronous-unwind-tables -Wno-address
 DEFINE GCC48_IA32_X64_ASLDLINK_FLAGS = DEF(GCC48_IA32_X64_DLINK_COMMON) -Wl,--entry,ReferenceAcpiTable -u ReferenceAcpiTable
 DEFINE GCC48_IA32_X64_DLINK_FLAGS    = DEF(GCC48_IA32_X64_DLINK_COMMON) -Wl,--entry,$(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Wl,-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map,--whole-archive
-DEFINE GCC48_IA32_DLINK2_FLAGS       = -Wl,--defsym=PECOFF_HEADER_SIZE=0x220 DEF(GCC_DLINK2_FLAGS_COMMON)
+DEFINE GCC48_IA32_DLINK2_FLAGS       = -Wl,--defsym=PECOFF_HEADER_SIZE=0x248 DEF(GCC_DLINK2_FLAGS_COMMON)
 DEFINE GCC48_X64_DLINK_FLAGS         = DEF(GCC48_IA32_X64_DLINK_FLAGS) -Wl,-melf_x86_64,--oformat=elf64-x86-64,-pie
-DEFINE GCC48_X64_DLINK2_FLAGS        = -Wl,--defsym=PECOFF_HEADER_SIZE=0x228 DEF(GCC_DLINK2_FLAGS_COMMON)
+DEFINE GCC48_X64_DLINK2_FLAGS        = -Wl,--defsym=PECOFF_HEADER_SIZE=0x250 DEF(GCC_DLINK2_FLAGS_COMMON)
 DEFINE GCC48_ASM_FLAGS               = DEF(GCC_ASM_FLAGS)
 DEFINE GCC48_ARM_ASM_FLAGS           = $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ASM_FLAGS) -mlittle-endian
 DEFINE GCC48_AARCH64_ASM_FLAGS       = $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ASM_FLAGS) -mlittle-endian
@@ -1917,9 +1917,9 @@ DEFINE GCC48_ARM_CC_XIPFLAGS         = DEF(GCC_ARM_CC_XIPFLAGS)
 DEFINE GCC48_AARCH64_CC_FLAGS        = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mcmodel=large DEF(GCC_AARCH64_CC_FLAGS)
 DEFINE GCC48_AARCH64_CC_XIPFLAGS     = DEF(GCC_AARCH64_CC_XIPFLAGS)
 DEFINE GCC48_ARM_DLINK_FLAGS         = DEF(GCC_ARM_DLINK_FLAGS) -Wl,--oformat=elf32-littlearm
-DEFINE GCC48_ARM_DLINK2_FLAGS        = DEF(GCC_DLINK2_FLAGS_COMMON) -Wl,--defsym=PECOFF_HEADER_SIZE=0x220
+DEFINE GCC48_ARM_DLINK2_FLAGS        = DEF(GCC_DLINK2_FLAGS_COMMON) -Wl,--defsym=PECOFF_HEADER_SIZE=0x248
 DEFINE GCC48_AARCH64_DLINK_FLAGS     = DEF(GCC_AARCH64_DLINK_FLAGS)
-DEFINE GCC48_AARCH64_DLINK2_FLAGS    = DEF(GCC_DLINK2_FLAGS_COMMON) -Wl,--defsym=PECOFF_HEADER_SIZE=0x228
+DEFINE GCC48_AARCH64_DLINK2_FLAGS    = DEF(GCC_DLINK2_FLAGS_COMMON) -Wl,--defsym=PECOFF_HEADER_SIZE=0x250
 DEFINE GCC48_ARM_ASLDLINK_FLAGS      = DEF(GCC_ARM_ASLDLINK_FLAGS) -Wl,--oformat=elf32-littlearm
 DEFINE GCC48_AARCH64_ASLDLINK_FLAGS  = DEF(GCC_AARCH64_ASLDLINK_FLAGS)
 DEFINE GCC48_ASLCC_FLAGS             = DEF(GCC_ASLCC_FLAGS)
@@ -1973,7 +1973,7 @@ DEFINE GCC5_ASLCC_FLAGS              = DEF(GCC49_ASLCC_FLAGS) -fno-lto
 DEFINE GCC5_RISCV_ALL_CC_FLAGS                    = -g -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -include AutoGen.h -fno-common -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings -msmall-data-limit=0
 DEFINE GCC5_RISCV_ALL_DLINK_COMMON                = -nostdlib -Wl,-n,-q,--gc-sections -z common-page-size=0x40 -z max-page-size=0x40
 DEFINE GCC5_RISCV_ALL_DLINK_FLAGS                 = DEF(GCC5_RISCV_ALL_DLINK_COMMON) -Wl,--entry,$(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Wl,-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map
-DEFINE GCC5_RISCV_ALL_DLINK2_FLAGS                = -Wl,--defsym=PECOFF_HEADER_SIZE=0x220,--script=$(EDK_TOOLS_PATH)/Scripts/GccBase.lds
+DEFINE GCC5_RISCV_ALL_DLINK2_FLAGS                = -Wl,--defsym=PECOFF_HEADER_SIZE=0x248,-L$(EDK_TOOLS_PATH)/Scripts/ -Wl,-L$(EDK_TOOLS_PATH)/Scripts/ -Wl,--default-script=$(EDK_TOOLS_PATH)/Scripts/GccEmitRdata.lds
 DEFINE GCC5_RISCV_ALL_ASM_FLAGS                   = -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
 DEFINE GCC5_RISCV_ALL_CC_FLAGS_WARNING_DISABLE    = -Wno-tautological-compare -Wno-pointer-compare
 
@@ -1981,7 +1981,7 @@ DEFINE GCC5_RISCV_OPENSBI_TYPES                   = -DOPENSBI_EXTERNAL_SBI_TYPES
 
 DEFINE GCC5_RISCV64_ARCH                   = rv64imafdc
 DEFINE GCC5_RISCV32_RISCV64_ASLDLINK_FLAGS = DEF(GCC5_RISCV_ALL_DLINK_COMMON) -Wl,--entry,ReferenceAcpiTable -u ReferenceAcpiTable
-DEFINE GCC5_RISCV64_CC_FLAGS               = DEF(GCC5_RISCV_ALL_CC_FLAGS) DEF(GCC5_RISCV_ALL_CC_FLAGS_WARNING_DISABLE) DEF(GCC5_RISCV_OPENSBI_TYPES) -march=DEF(GCC5_RISCV64_ARCH) -fno-builtin -fno-builtin-memcpy -fno-stack-protector -Wno-address -fno-asynchronous-unwind-tables -Wno-unused-but-set-variable -fpack-struct=8 -mcmodel=medany -mabi=lp64 -mno-relax
+DEFINE GCC5_RISCV64_CC_FLAGS               = DEF(GCC5_RISCV_ALL_CC_FLAGS) DEF(GCC5_RISCV_ALL_CC_FLAGS_WARNING_DISABLE) DEF(GCC5_RISCV_OPENSBI_TYPES) -march=DEF(GCC5_RISCV64_ARCH) -fno-builtin -fno-builtin-memcpy -fno-stack-protector -Wno-address -fno-asynchronous-unwind-tables -Wno-unused-but-set-variable -fpack-struct=8 -mcmodel=medany -mabi=lp64 -mno-relax -Wno-vla-parameter
 DEFINE GCC5_RISCV64_DLINK_FLAGS            = DEF(GCC5_RISCV_ALL_DLINK_FLAGS) -Wl,-melf64lriscv,--oformat=elf64-littleriscv,--no-relax
 DEFINE GCC5_RISCV64_DLINK2_FLAGS           = DEF(GCC5_RISCV_ALL_DLINK2_FLAGS)
 DEFINE GCC5_RISCV64_ASM_FLAGS              = DEF(GCC5_RISCV_ALL_ASM_FLAGS) -march=DEF(GCC5_RISCV64_ARCH) -mcmodel=medany -mabi=lp64
@@ -2510,7 +2510,7 @@ DEFINE CLANG35_AARCH64_CC_FLAGS  = DEF(GCC_AARCH64_CC_FLAGS) DEF(CLANG35_AARCH64
 *_CLANG35_ARM_ASLDLINK_FLAGS     = DEF(CLANG35_ARM_TARGET) DEF(GCC_ARM_ASLDLINK_FLAGS)
 *_CLANG35_ARM_ASM_FLAGS          = DEF(GCC_ASM_FLAGS) DEF(CLANG35_ARM_TARGET) $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) -Qunused-arguments
 *_CLANG35_ARM_DLINK_FLAGS        = DEF(CLANG35_ARM_TARGET) DEF(GCC_ARM_DLINK_FLAGS)
-*_CLANG35_ARM_DLINK2_FLAGS       = DEF(GCC_DLINK2_FLAGS_COMMON) -Wl,--defsym=PECOFF_HEADER_SIZE=0x220
+*_CLANG35_ARM_DLINK2_FLAGS       = DEF(GCC_DLINK2_FLAGS_COMMON) -Wl,--defsym=PECOFF_HEADER_SIZE=0x248
 *_CLANG35_ARM_PLATFORM_FLAGS     = -march=armv7-a -mkernel -Qunused-arguments
 *_CLANG35_ARM_PP_FLAGS           = DEF(GCC_PP_FLAGS) DEF(CLANG35_ARM_TARGET) $(ARCHCC_FLAGS) $(PLATFORM_FLAGS)
 *_CLANG35_ARM_RC_FLAGS           = DEF(GCC_ARM_RC_FLAGS)
@@ -2533,7 +2533,7 @@ RELEASE_CLANG35_ARM_CC_FLAGS     = DEF(CLANG35_ARM_CC_FLAGS) $(ARCHCC_FLAGS) $(P
 *_CLANG35_AARCH64_ASM_FLAGS      = DEF(GCC_ASM_FLAGS) DEF(CLANG35_AARCH64_TARGET) $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) -Qunused-arguments
 *_CLANG35_AARCH64_DLINK_FLAGS    = DEF(CLANG35_AARCH64_TARGET) DEF(GCC_AARCH64_DLINK_FLAGS) -z common-page-size=0x1000 -z max-page-size=0x1000
 *_CLANG35_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20 -z max-page-size=0x20
-*_CLANG35_AARCH64_DLINK2_FLAGS   = DEF(GCC_DLINK2_FLAGS_COMMON) -Wl,--defsym=PECOFF_HEADER_SIZE=0x228
+*_CLANG35_AARCH64_DLINK2_FLAGS   = DEF(GCC_DLINK2_FLAGS_COMMON) -Wl,--defsym=PECOFF_HEADER_SIZE=0x250
 *_CLANG35_AARCH64_PLATFORM_FLAGS =
 *_CLANG35_AARCH64_PP_FLAGS       = DEF(GCC_PP_FLAGS) DEF(CLANG35_AARCH64_TARGET) $(ARCHCC_FLAGS) $(PLATFORM_FLAGS)
 *_CLANG35_AARCH64_RC_FLAGS       = DEF(GCC_AARCH64_RC_FLAGS)
@@ -2672,7 +2672,7 @@ DEFINE CLANG38_ARM_DLINK_FLAGS   = DEF(CLANG38_ARM_TARGET) DEF(GCC_ARM_DLINK_FLA
 *_CLANG38_ARM_ASLCC_FLAGS        = DEF(GCC_ASLCC_FLAGS) -fno-lto
 *_CLANG38_ARM_ASLDLINK_FLAGS     = DEF(CLANG38_ARM_TARGET) DEF(GCC_ARM_ASLDLINK_FLAGS)
 *_CLANG38_ARM_ASM_FLAGS          = DEF(GCC_ASM_FLAGS) DEF(CLANG38_ARM_TARGET) $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) -Qunused-arguments
-*_CLANG38_ARM_DLINK2_FLAGS       = DEF(GCC_DLINK2_FLAGS_COMMON) -Wl,--defsym=PECOFF_HEADER_SIZE=0x220
+*_CLANG38_ARM_DLINK2_FLAGS       = DEF(GCC_DLINK2_FLAGS_COMMON) -Wl,--defsym=PECOFF_HEADER_SIZE=0x248
 *_CLANG38_ARM_PLATFORM_FLAGS     = -march=armv7-a
 *_CLANG38_ARM_PP_FLAGS           = DEF(GCC_PP_FLAGS) DEF(CLANG38_ARM_TARGET) $(ARCHCC_FLAGS) $(PLATFORM_FLAGS)
 *_CLANG38_ARM_RC_FLAGS           = DEF(GCC_ARM_RC_FLAGS)
@@ -2718,7 +2718,7 @@ DEFINE CLANG38_AARCH64_DLINK_FLAGS  = DEF(CLANG38_AARCH64_TARGET) DEF(GCC_AARCH6
 *_CLANG38_AARCH64_ASM_FLAGS      = DEF(GCC_ASM_FLAGS) DEF(CLANG38_AARCH64_TARGET) $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) -Qunused-arguments
 *_CLANG38_AARCH64_DLINK_FLAGS    = DEF(CLANG38_AARCH64_TARGET) DEF(GCC_AARCH64_DLINK_FLAGS) -z common-page-size=0x1000 -z max-page-size=0x1000
 *_CLANG38_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20 -z max-page-size=0x20
-*_CLANG38_AARCH64_DLINK2_FLAGS   = DEF(GCC_DLINK2_FLAGS_COMMON) -Wl,--defsym=PECOFF_HEADER_SIZE=0x228
+*_CLANG38_AARCH64_DLINK2_FLAGS   = DEF(GCC_DLINK2_FLAGS_COMMON) -Wl,--defsym=PECOFF_HEADER_SIZE=0x250
 *_CLANG38_AARCH64_PLATFORM_FLAGS =
 *_CLANG38_AARCH64_PP_FLAGS       = DEF(GCC_PP_FLAGS) DEF(CLANG38_AARCH64_TARGET) $(ARCHCC_FLAGS) $(PLATFORM_FLAGS)
 *_CLANG38_AARCH64_RC_FLAGS       = DEF(GCC_AARCH64_RC_FLAGS)
@@ -2851,13 +2851,13 @@ DEFINE CLANGDWARF_IA32_PREFIX       = ENV(CLANG_BIN)
 DEFINE CLANGDWARF_X64_PREFIX        = ENV(CLANG_BIN)
 
 # LLVM/CLANG doesn't support -n link option. So, it can't share the same IA32_X64_DLINK_COMMON flag.
-# LLVM/CLANG doesn't support common page size. So, it can't share the same GccBase.lds script.
+# LLVM/CLANG doesn't support common page size. So, it can't share the same GccEmitRdata.lds script.
 DEFINE CLANGDWARF_IA32_X64_DLINK_COMMON   = -nostdlib -Wl,-q,--gc-sections -z max-page-size=0x40
-DEFINE CLANGDWARF_DLINK2_FLAGS_COMMON     = -Wl,--script=$(EDK_TOOLS_PATH)/Scripts/ClangBase.lds
+DEFINE CLANGDWARF_DLINK2_FLAGS_COMMON     = -Wl,-L$(EDK_TOOLS_PATH)/Scripts/ -Wl,-L$(EDK_TOOLS_PATH)/Scripts/ -Wl,--default-script=$(EDK_TOOLS_PATH)/Scripts/ClangEmitRdata.lds
 DEFINE CLANGDWARF_IA32_X64_ASLDLINK_FLAGS = DEF(CLANGDWARF_IA32_X64_DLINK_COMMON) -Wl,--defsym=PECOFF_HEADER_SIZE=0 DEF(CLANGDWARF_DLINK2_FLAGS_COMMON) -Wl,--entry,ReferenceAcpiTable -u ReferenceAcpiTable
 DEFINE CLANGDWARF_IA32_X64_DLINK_FLAGS    = DEF(CLANGDWARF_IA32_X64_DLINK_COMMON) -Wl,--entry,$(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Wl,-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map,--whole-archive
-DEFINE CLANGDWARF_IA32_DLINK2_FLAGS       = -Wl,--defsym=PECOFF_HEADER_SIZE=0x220 DEF(CLANGDWARF_DLINK2_FLAGS_COMMON)
-DEFINE CLANGDWARF_X64_DLINK2_FLAGS        = -Wl,--defsym=PECOFF_HEADER_SIZE=0x228 DEF(CLANGDWARF_DLINK2_FLAGS_COMMON)
+DEFINE CLANGDWARF_IA32_DLINK2_FLAGS       = -Wl,--defsym=PECOFF_HEADER_SIZE=0x248 DEF(CLANGDWARF_DLINK2_FLAGS_COMMON)
+DEFINE CLANGDWARF_X64_DLINK2_FLAGS        = -Wl,--defsym=PECOFF_HEADER_SIZE=0x250 DEF(CLANGDWARF_DLINK2_FLAGS_COMMON)
 
 ###########################
 # CLANGDWARF IA32 definitions
@@ -2957,11 +2957,24 @@ NOOPT_CLANGDWARF_X64_DLINK2_FLAGS     = DEF(CLANGDWARF_X64_DLINK2_FLAGS) -O0 -fu
 *_XCODE5_*_MTOC_PATH     = /usr/local/bin/mtoc
 *_XCODE5_*_DEPS_FLAGS    = DEF(GCC_DEPS_FLAGS)
 
+#
+# x86_64 Preload Mach-O files index relocations relative to the first writable
+# section, usually in __DATA. Merging __DATA,__const, which may have relocations
+# targeting it, into __TEXT moves it in front of __DATA, yielding negative
+# offsets to the relocation base address. These cannot be represented by the
+# Mach-O relocation offsets, resulting in a broken binary.
+# To work around this, introduce a new 0-sized segment __RELOC_FIX segment with
+# RW permissions, which will make all relocations relative to the beginning of
+# image. This also makes the usage of "-read_only_relocs suppress" safe, as
+# relocations can now target __TEXT without triggering the same issue.
+#
+DEFINE XCODE5_RODATA_ARGS = -segprot __RELOC_FIX rw- rw- -segprot __DATA_CONST r-- r--  -segment_order __RELOC_FIX:__TEXT:__DATA_CONST:__DATA  -rename_section __DATA __const __RELOC_FIX __const -rename_section __RELOC_FIX __const __DATA_CONST __const -rename_section __TEXT __const __DATA_CONST __text_const -rename_section __TEXT __cstring __DATA_CONST __cstring -rename_section __TEXT __ustring __DATA_CONST __ustring
+
 ##################
 # ASL definitions
 ##################
 *_XCODE5_*_ASLCC_FLAGS      = -x c -save-temps -g -O0 -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -c -include AutoGen.h
-*_XCODE5_*_ASLDLINK_FLAGS   = -e _ReferenceAcpiTable -preload -segalign 0x20  -pie -seg1addr 0x240 -read_only_relocs suppress -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+*_XCODE5_*_ASLDLINK_FLAGS   = -e _ReferenceAcpiTable -preload -segalign 0x20  -pie -seg1addr 0x260 -read_only_relocs suppress -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
 *_XCODE5_*_ASLPP_FLAGS      = -x c -E -include AutoGen.h
 *_XCODE5_*_ASL_FLAGS        =
 *_XCODE5_*_ASL_OUTFLAGS     = DEF(IASL_OUTFLAGS)
@@ -2977,9 +2990,9 @@ RELEASE_XCODE5_*_MTOC_FLAGS = -align 0x20
 ####################
 # IA-32 definitions
 ####################
-  DEBUG_XCODE5_IA32_DLINK_FLAGS      = -arch i386 -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20  -pie -all_load -dead_strip -seg1addr 0x240 -read_only_relocs suppress -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
-  NOOPT_XCODE5_IA32_DLINK_FLAGS      = -arch i386 -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20  -pie -all_load -dead_strip -seg1addr 0x240 -read_only_relocs suppress -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
-RELEASE_XCODE5_IA32_DLINK_FLAGS      = -arch i386 -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20  -pie -all_load -dead_strip -seg1addr 0x240 -read_only_relocs suppress -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+  DEBUG_XCODE5_IA32_DLINK_FLAGS      =  DEF(XCODE5_RODATA_ARGS) -arch i386 -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20  -pie -all_load -dead_strip -seg1addr 0x260 -read_only_relocs suppress -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+  NOOPT_XCODE5_IA32_DLINK_FLAGS      =  DEF(XCODE5_RODATA_ARGS) -arch i386 -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20  -pie -all_load -dead_strip -seg1addr 0x260 -read_only_relocs suppress -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+RELEASE_XCODE5_IA32_DLINK_FLAGS      =  DEF(XCODE5_RODATA_ARGS) -arch i386 -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20  -pie -all_load -dead_strip -seg1addr 0x260 -read_only_relocs suppress -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
 
 *_XCODE5_IA32_SLINK_FLAGS      = -static -o
   DEBUG_XCODE5_IA32_ASM_FLAGS  = -arch i386 -g
@@ -2995,9 +3008,9 @@ RELEASE_XCODE5_IA32_CC_FLAGS   = -arch i386 -c    -Os       -Wall -Werror -inclu
 ##################
 # X64 definitions
 ##################
-  DEBUG_XCODE5_X64_DLINK_FLAGS      = -arch x86_64 -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20  -pie -all_load -dead_strip -seg1addr 0x240 -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
-  NOOPT_XCODE5_X64_DLINK_FLAGS      = -arch x86_64 -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20  -pie -all_load -dead_strip -seg1addr 0x240 -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
-RELEASE_XCODE5_X64_DLINK_FLAGS      = -arch x86_64 -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20  -pie -all_load -dead_strip -seg1addr 0x240 -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+  DEBUG_XCODE5_X64_DLINK_FLAGS      =  DEF(XCODE5_RODATA_ARGS) -arch x86_64 -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20  -pie -all_load -dead_strip -seg1addr 0x260 -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+  NOOPT_XCODE5_X64_DLINK_FLAGS      =  DEF(XCODE5_RODATA_ARGS) -arch x86_64 -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20  -pie -all_load -dead_strip -seg1addr 0x260 -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+RELEASE_XCODE5_X64_DLINK_FLAGS      =  DEF(XCODE5_RODATA_ARGS) -arch x86_64 -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20  -pie -all_load -dead_strip -seg1addr 0x260 -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
 
 *_XCODE5_X64_SLINK_FLAGS      = -static -o
   DEBUG_XCODE5_X64_ASM_FLAGS  = -arch x86_64 -g

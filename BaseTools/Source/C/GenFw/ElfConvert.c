@@ -204,6 +204,9 @@ ConvertElf (
   if (!ElfFunctions.WriteSections (SECTION_TEXT)) {
     return FALSE;
   }
+  if (!ElfFunctions.WriteSections (SECTION_RODATA)) {
+    return FALSE;
+  }
   if (!ElfFunctions.WriteSections (SECTION_DATA)) {
     return FALSE;
   }

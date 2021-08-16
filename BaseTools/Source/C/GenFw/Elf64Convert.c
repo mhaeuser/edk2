@@ -106,7 +106,7 @@ STATIC UINT32 mCoffAlignment = 0x20;
 //
 // PE section alignment.
 //
-STATIC const UINT16 mCoffNbrSections = 4;
+STATIC const UINT16 mCoffNbrSections = 5;
 
 //
 // ELF sections to offset in Coff file.
@@ -118,6 +118,7 @@ STATIC UINT32 *mCoffSectionsOffset = NULL;
 //
 STATIC UINT32 mNtHdrOffset;
 STATIC UINT32 mTextOffset;
+STATIC UINT32 mRdataOffset;
 STATIC UINT32 mDataOffset;
 STATIC UINT32 mHiiRsrcOffset;
 STATIC UINT32 mRelocOffset;
@@ -248,8 +249,19 @@ IsTextShdr (
   Elf_Shdr *Shdr
   )
 {
-  return (BOOLEAN) (((Shdr->sh_flags & (SHF_EXECINSTR | SHF_ALLOC)) == (SHF_EXECINSTR | SHF_ALLOC)) ||
-                   ((Shdr->sh_flags & (SHF_WRITE | SHF_ALLOC)) == SHF_ALLOC));
+  return (BOOLEAN) ((Shdr->sh_flags & (SHF_EXECINSTR | SHF_ALLOC)) == (SHF_EXECINSTR | SHF_ALLOC));
+}
+
+STATIC
+BOOLEAN
+IsRodataShdr (
+  Elf_Shdr *Shdr
+  )
+{
+  Elf_Shdr *Namedr = GetShdrByIndex(mEhdr->e_shstrndx);
+
+  return (BOOLEAN) (((Shdr->sh_flags & (SHF_EXECINSTR | SHF_WRITE | SHF_ALLOC)) == SHF_ALLOC)
+    || (strcmp((CHAR8*)mEhdr + Namedr->sh_offset + Shdr->sh_name, ".rodata") == 0));
 }
 
 STATIC
@@ -269,7 +281,7 @@ IsDataShdr (
   Elf_Shdr *Shdr
   )
 {
-  if (IsHiiRsrcShdr(Shdr)) {
+  if (IsRodataShdr(Shdr) || IsHiiRsrcShdr(Shdr)) {
     return FALSE;
   }
   return (BOOLEAN) (Shdr->sh_flags & (SHF_EXECINSTR | SHF_WRITE | SHF_ALLOC)) == (SHF_ALLOC | SHF_WRITE);
@@ -750,7 +762,7 @@ ScanSections64 (
     if (shdr->sh_addralign <= mCoffAlignment) {
       continue;
     }
-    if (IsTextShdr(shdr) || IsDataShdr(shdr) || IsHiiRsrcShdr(shdr)) {
+    if (IsTextShdr(shdr) || IsRodataShdr(shdr) || IsDataShdr(shdr) || IsHiiRsrcShdr(shdr)) {
       mCoffAlignment = (UINT32)shdr->sh_addralign;
     }
   }
@@ -791,7 +803,7 @@ ScanSections64 (
           mCoffOffset = (UINT32) ((mCoffOffset + shdr->sh_addralign - 1) & ~(shdr->sh_addralign - 1));
 
           if (mCoffOffset != shdr->sh_addr) {
-            Error (NULL, 0, 3000, "Invalid", "Section address does not match PE/COFF offset (%x vs %x).", shdr->sh_addr, mCoffOffset);
+            Error (NULL, 0, 3000, "Invalid", "text Section address does not match PE/COFF offset (%x vs %x).", shdr->sh_addr, mCoffOffset);
           }
         } else {
           Error (NULL, 0, 3000, "Invalid", "Section address not aligned to its own alignment.");
@@ -831,6 +843,50 @@ ScanSections64 (
   }
 
   //
+  //  Then rdata sections.
+  //
+  mDataOffset = mCoffOffset;
+  FoundSection = FALSE;
+  SectionCount = 0;
+  for (i = 0; i < mEhdr->e_shnum; i++) {
+    Elf_Shdr *shdr = GetShdrByIndex(i);
+    if (IsRodataShdr(shdr)) {
+      if ((shdr->sh_addralign != 0) && (shdr->sh_addralign != 1)) {
+        // the alignment field is valid
+        if ((shdr->sh_addr & (shdr->sh_addralign - 1)) == 0) {
+          // if the section address is aligned we must align PE/COFF
+          mCoffOffset = (UINT32) ((mCoffOffset + shdr->sh_addralign - 1) & ~(shdr->sh_addralign - 1));
+
+          if (mCoffOffset != shdr->sh_addr) {
+            Error (NULL, 0, 3000, "Invalid", "rodata Section address does not match PE/COFF offset (%x vs %x).", shdr->sh_addr, mCoffOffset);
+          }
+        } else {
+          Error (NULL, 0, 3000, "Invalid", "Section address not aligned to its own alignment.");
+        }
+      }
+
+      //
+      // Set mRdataOffset with the offset of the first '.rdata' section
+      //
+      if (!FoundSection) {
+        mRdataOffset = mCoffOffset;
+        FoundSection = TRUE;
+      }
+      mCoffSectionsOffset[i] = mCoffOffset;
+      mCoffOffset += (UINT32) shdr->sh_size;
+      SectionCount ++;
+    }
+  }
+
+  if (SectionCount > 1 && mOutImageType == FW_EFI_IMAGE) {
+    Warning (NULL, 0, 0, NULL, "Multiple sections in %s are merged into 1 rdata section. Source level debug might not work correctly.", mInImageName);
+  }
+
+  if (SectionCount == 0) {
+    mRdataOffset = mCoffOffset;
+  }
+
+  //
   //  Then data sections.
   //
   mDataOffset = mCoffOffset;
@@ -846,7 +902,7 @@ ScanSections64 (
           mCoffOffset = (UINT32) ((mCoffOffset + shdr->sh_addralign - 1) & ~(shdr->sh_addralign - 1));
 
           if (mCoffOffset != shdr->sh_addr) {
-            Error (NULL, 0, 3000, "Invalid", "Section address does not match PE/COFF offset (%x vs %x).", shdr->sh_addr, mCoffOffset);
+            Error (NULL, 0, 3000, "Invalid", "data Section address does not match PE/COFF offset (%x vs %x).", shdr->sh_addr, mCoffOffset);
           }
         } else {
           Error (NULL, 0, 3000, "Invalid", "Section address not aligned to its own alignment.");
@@ -900,10 +956,6 @@ ScanSections64 (
         if ((shdr->sh_addr & (shdr->sh_addralign - 1)) == 0) {
           // if the section address is aligned we must align PE/COFF
           mCoffOffset = (UINT32) ((mCoffOffset + shdr->sh_addralign - 1) & ~(shdr->sh_addralign - 1));
-
-          if (mCoffOffset != shdr->sh_addr) {
-            Error (NULL, 0, 3000, "Invalid", "Section address does not match PE/COFF offset (%x vs %x).", shdr->sh_addr, mCoffOffset);
-          }
         } else {
           Error (NULL, 0, 3000, "Invalid", "Section address not aligned to its own alignment.");
         }
@@ -973,8 +1025,8 @@ ScanSections64 (
     | EFI_IMAGE_FILE_LOCAL_SYMS_STRIPPED
     | EFI_IMAGE_FILE_LARGE_ADDRESS_AWARE;
 
-  NtHdr->Pe32Plus.OptionalHeader.SizeOfCode = mDataOffset - mTextOffset;
-  NtHdr->Pe32Plus.OptionalHeader.SizeOfInitializedData = mRelocOffset - mDataOffset;
+  NtHdr->Pe32Plus.OptionalHeader.SizeOfCode = mRdataOffset - mTextOffset;
+  NtHdr->Pe32Plus.OptionalHeader.SizeOfInitializedData = mRelocOffset - mRdataOffset;
   NtHdr->Pe32Plus.OptionalHeader.SizeOfUninitializedData = 0;
   NtHdr->Pe32Plus.OptionalHeader.AddressOfEntryPoint = CoffEntry;
 
@@ -991,10 +1043,19 @@ ScanSections64 (
   //
   // Section headers.
   //
-  if ((mDataOffset - mTextOffset) > 0) {
-    CreateSectionHeader (".text", mTextOffset, mDataOffset - mTextOffset,
+  if ((mRdataOffset - mTextOffset) > 0) {
+    CreateSectionHeader (".text", mTextOffset, mRdataOffset - mTextOffset,
             EFI_IMAGE_SCN_CNT_CODE
             | EFI_IMAGE_SCN_MEM_EXECUTE
+            | EFI_IMAGE_SCN_MEM_READ);
+  } else {
+    // Don't make a section of size 0.
+    NtHdr->Pe32Plus.FileHeader.NumberOfSections--;
+  }
+
+  if ((mDataOffset - mRdataOffset) > 0) {
+    CreateSectionHeader (".rdata", mRdataOffset, mDataOffset - mRdataOffset,
+            EFI_IMAGE_SCN_CNT_INITIALIZED_DATA
             | EFI_IMAGE_SCN_MEM_READ);
   } else {
     // Don't make a section of size 0.
@@ -1049,6 +1110,9 @@ WriteSections64 (
       break;
     case SECTION_DATA:
       Filter = IsDataShdr;
+      break;
+    case SECTION_RODATA:
+      Filter = IsRodataShdr;
       break;
     default:
       return FALSE;
@@ -1454,7 +1518,7 @@ WriteRelocations64 (
     Elf_Shdr *RelShdr = GetShdrByIndex(Index);
     if ((RelShdr->sh_type == SHT_REL) || (RelShdr->sh_type == SHT_RELA)) {
       Elf_Shdr *SecShdr = GetShdrByIndex (RelShdr->sh_info);
-      if (IsTextShdr(SecShdr) || IsDataShdr(SecShdr)) {
+      if (IsTextShdr(SecShdr) || IsRodataShdr(SecShdr) || IsDataShdr(SecShdr)) {
         UINT64 RelIdx;
 
         for (RelIdx = 0; RelIdx < RelShdr->sh_size; RelIdx += RelShdr->sh_entsize) {

@@ -38,7 +38,8 @@ extern UINT32 mFileBufferSize;
 typedef enum {
   SECTION_TEXT,
   SECTION_HII,
-  SECTION_DATA
+  SECTION_DATA,
+  SECTION_RODATA
 
 } SECTION_FILTER_TYPES;
 
