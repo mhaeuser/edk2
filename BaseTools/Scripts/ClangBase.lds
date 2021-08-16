@@ -42,7 +42,7 @@ SECTIONS {
    * between these sections is the same in the ELF and the PE/COFF versions of
    * this binary.
    */
-  .data ALIGN(ALIGNOF(.text)) : ALIGN(CONSTANT(MAXPAGESIZE)) {
+  .data : ALIGN(CONSTANT(MAXPAGESIZE)) {
     *(.data .data.* .gnu.linkonce.d.*)
     *(.bss .bss.*)
   }
