@@ -647,7 +647,13 @@ CoreLoadPeImage (
 
       Status = GetPeCoffImageFixLoadingAssignedAddress (&(Image->ImageContext));
 
-      if (EFI_ERROR (Status))  {
+      if (!EFI_ERROR (Status))  {
+          if (PreferredAddress != Image->ImageContext.ImageAddress && Image->ImageContext.RelocationsStripped) {
+            Status = EFI_UNSUPPORTED;
+            DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED ERROR: Loading module at fixed address failed since relocations have been stripped.\n"));
+            Image->ImageContext.ImageAddress = PreferredAddress;
+          }
+      } else {
           //
           // If the code memory is not ready, invoke CoreAllocatePage with AllocateAnyPages to load the driver.
           //
