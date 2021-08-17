@@ -1049,6 +1049,15 @@ ExecuteSmmCoreFromSmram (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  //
+  // Stripped Image relocations are not supported for both fixed-address and
+  // dynamic loading.
+  //
+  if (ImageContext.RelocationsStripped) {
+    return EFI_UNSUPPORTED;
+  }
+
   //
   // if Loading module at Fixed Address feature is enabled, the SMM core driver will be loaded to
   // the address assigned by build tool.
