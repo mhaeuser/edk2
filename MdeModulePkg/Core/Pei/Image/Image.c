@@ -364,18 +364,18 @@ LoadAndRelocatePeCoffImage (
       AlignImageSize += ImageContext.SectionAlignment;
     }
 
+    Status = EFI_UNSUPPORTED;
+
     if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0 && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME)) {
       Status = GetPeCoffImageFixLoadingAssignedAddress(&ImageContext, Private);
       if (EFI_ERROR (Status)){
         DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED ERROR: Failed to load module at fixed address. \n"));
-        //
-        // The PEIM is not assigned valid address, try to allocate page to load it.
-        //
-        Status = PeiServicesAllocatePages (EfiBootServicesCode,
-                                           EFI_SIZE_TO_PAGES ((UINT32) AlignImageSize),
-                                           &ImageContext.ImageAddress);
       }
-    } else {
+    }
+    if (EFI_ERROR (Status)){
+      //
+      // The PEIM is not assigned valid address, try to allocate page to load it.
+      //
       Status = PeiServicesAllocatePages (EfiBootServicesCode,
                                          EFI_SIZE_TO_PAGES ((UINT32) AlignImageSize),
                                          &ImageContext.ImageAddress);
