@@ -447,6 +447,18 @@ SmmLoadImage (
     }
     return Status;
   }
+
+  //
+  // Stripped Image relocations are not supported for both fixed-address and
+  // dynamic loading.
+  //
+  if (ImageContext.RelocationsStripped) {
+    if (Buffer != NULL) {
+      gBS->FreePool (Buffer);
+    }
+    return EFI_UNSUPPORTED;
+  }
+
   //
   // if Loading module at Fixed Address feature is enabled, then  cut out a memory range started from TESG BASE
   // to hold the Smm driver code
