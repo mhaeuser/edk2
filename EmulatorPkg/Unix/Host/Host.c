@@ -1042,7 +1042,7 @@ PrintLoadAddress (
   } else {
     fprintf (stderr,
       "0x%08lx Loading %s with entry point 0x%08lx\n",
-      (unsigned long)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders),
+      (unsigned long)ImageContext->ImageAddress,
       ImageContext->PdbPointer,
       (unsigned long)ImageContext->EntryPoint
       );
@@ -1148,7 +1148,7 @@ GdbScriptAddImage (
     if (FeaturePcdGet (PcdEmulatorLazyLoadSymbols)) {
       GdbTempFile = fopen (gGdbWorkingFileName, "a");
       if (GdbTempFile != NULL) {
-        long unsigned int SymbolsAddr = (long unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders);
+        long unsigned int SymbolsAddr = (long unsigned int)ImageContext->ImageAddress;
         mScriptSymbolChangesCount++;
         fprintf (
           GdbTempFile,
@@ -1159,7 +1159,7 @@ GdbScriptAddImage (
           );
         fclose (GdbTempFile);
         // This is for the lldb breakpoint only
-        SecGdbScriptBreak (ImageContext->PdbPointer, strlen (ImageContext->PdbPointer) + 1, (long unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders), 1);
+        SecGdbScriptBreak (ImageContext->PdbPointer, strlen (ImageContext->PdbPointer) + 1, (long unsigned int)ImageContext->ImageAddress, 1);
       } else {
         ASSERT (FALSE);
       }
@@ -1168,9 +1168,9 @@ GdbScriptAddImage (
       if (GdbTempFile != NULL) {
         fprintf (
           GdbTempFile,
-          "add-symbol-file %s 0x%08lx\n",
+          "add-symbol-file %s -o 0x%08lx\n",
           ImageContext->PdbPointer,
-          (long unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)
+          (long unsigned int)ImageContext->ImageAddress
           );
         fclose (GdbTempFile);
 
@@ -1180,7 +1180,7 @@ GdbScriptAddImage (
         // Also used for the lldb breakpoint script. The lldb breakpoint script does
         // not use the file, it uses the arguments.
         //
-        SecGdbScriptBreak (ImageContext->PdbPointer, strlen (ImageContext->PdbPointer) + 1, (long unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders), 1);
+        SecGdbScriptBreak (ImageContext->PdbPointer, strlen (ImageContext->PdbPointer) + 1, (long unsigned int)ImageContext->ImageAddress, 1);
       } else {
         ASSERT (FALSE);
       }
