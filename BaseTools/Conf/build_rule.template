@@ -652,22 +652,15 @@
         "$(VFRPP)" $(DEPS_FLAGS) $(VFRPP_FLAGS) $(INC) ${src} > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
         "$(VFR)" $(VFR_FLAGS) --create-ifr-package --string-db $(OUTPUT_DIR)(+)$(MODULE_NAME)StrDefs.hpk --output-directory $(OUTPUT_DIR)(+)${s_dir} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
 
-[Hii-Binary-Package.UEFI_HII]
+[Hii-Variable-Package.UEFI_HII]
     <InputFile>
         *.hpk
 
     <OutputFile.MSFT, OutputFile.INTEL, OutputFile.GCC, OutputFile.CLANGPDB>
-        $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.lib
-
-    <OutputFile.XCODE, OutputFile.RVCT>
-        $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc
+        $(DEBUG_DIR)(+)AutoGenHii.c
 
     <Command.MSFT, Command.INTEL, Command.CLANGPDB>
-        "$(GENFW)" -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiipackage $(HII_BINARY_PACKAGES) $(GENFW_FLAGS)
-        "$(RC)" /Fo${dst} $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc
+        "$(GENFW)" -o $(DEBUG_DIR)(+)AutoGenHii.c -g $(MODULE_GUID) --hiivariable $(HII_VARIABLE_PACKAGES) $(GENFW_FLAGS)
 
     <Command.GCC>
-        "$(GENFW)" -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiibinpackage $(HII_BINARY_PACKAGES) $(GENFW_FLAGS)
-        "$(RC)" $(RC_FLAGS) $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc ${dst}
-    <Command.XCODE, Command.RVCT, Command.CLANGGCC>
-        "$(GENFW)" -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiibinpackage $(HII_BINARY_PACKAGES) $(GENFW_FLAGS)
+        "$(GENFW)" -o $(DEBUG_DIR)(+)AutoGenHii.c -g $(MODULE_GUID) --hiivariable $(HII_VARIABLE_PACKAGES) $(GENFW_FLAGS)

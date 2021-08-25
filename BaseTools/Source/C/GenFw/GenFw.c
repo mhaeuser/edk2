@@ -1436,6 +1436,13 @@ Returns:
       continue;
     }
 
+    if (stricmp (argv[0], "--hiivariable") == 0) {
+      mOutImageType = FW_HII_PACKAGE_LIST_RCVAR;
+      argc --;
+      argv ++;
+      continue;
+    }
+
     if (argv[0][0] == '-') {
       Error (NULL, 0, 1000, "Unknown option", argv[0]);
       goto Finish;
@@ -1512,6 +1519,11 @@ Returns:
     goto Finish;
   }
 
+  if ((mOutImageType == FW_HII_PACKAGE_LIST_RCVAR) && ReplaceFlag) {
+    Error (NULL, 0, 1002, "Conflicting option", "-r replace option cannot be used with --hiibinpackage merge files option.");
+    goto Finish;
+  }
+
   //
   // Input image file
   //
@@ -1557,6 +1569,9 @@ Returns:
     break;
   case FW_HII_PACKAGE_LIST_BINIMAGE:
     VerboseMsg ("Combine the input multi hii bin packages to one binary package list file.");
+    break;
+  case FW_HII_PACKAGE_LIST_RCVAR:
+    VerboseMsg ("Combine the input multi hii bin packages to one variable package list file.");
     break;
   case FW_REBASE_IMAGE:
     VerboseMsg ("Rebase the input image to new base address.");
@@ -1634,7 +1649,7 @@ Returns:
   //
   // Combine multi binary HII package files.
   //
-  if (mOutImageType == FW_HII_PACKAGE_LIST_RCIMAGE || mOutImageType == FW_HII_PACKAGE_LIST_BINIMAGE) {
+  if (mOutImageType == FW_HII_PACKAGE_LIST_RCIMAGE || mOutImageType == FW_HII_PACKAGE_LIST_BINIMAGE || mOutImageType == FW_HII_PACKAGE_LIST_RCVAR) {
     //
     // Open output file handle.
     //
@@ -1763,6 +1778,43 @@ Returns:
       if ((Index + 1) == HiiPackageListHeader.PackageLength) {
         fprintf (fpOut, " 0x%04X\n}\n", *(UINT8 *) HiiPackageDataPointer);
       }
+      free (HiiPackageListBuffer);
+      //
+      // Done successfully
+      //
+      goto Finish;
+    }
+
+    //
+    // write the hii package into the variable package list rc file.
+    //
+    if (mOutImageType == FW_HII_PACKAGE_LIST_RCVAR) {
+      for (Index = 0; gHiiPackageRCFileHeader[Index] != NULL; Index++) {
+        fprintf (fpOut, "%s\n", gHiiPackageRCFileHeader[Index]);
+      }
+      fprintf (
+        fpOut,
+        "\n#include <Uefi.h>\n"
+        "\nSTATIC CONST UINT8 mHiiPackageListData[] = {"
+        );
+
+      HiiPackageDataPointer = HiiPackageListBuffer;
+      for (Index = 0; Index < HiiPackageListHeader.PackageLength; ++Index) {
+        if (Index % 13 == 0) {
+          fprintf (fpOut, "\n ");
+        }
+        fprintf (fpOut, " 0x%02X,", *(UINT8 *) HiiPackageDataPointer);
+        ++HiiPackageDataPointer;
+      }
+
+      fprintf (fpOut, " \n};\n");
+      fprintf (
+        fpOut,
+        "\nGLOBAL_REMOVE_IF_UNREFERENCED CONST VOID *gModuleHiiPackageList ="
+        "\n  (CONST EFI_HII_PACKAGE_LIST_HEADER *) mHiiPackageListData;\n"
+        "\nGLOBAL_REMOVE_IF_UNREFERENCED CONST UINTN gModuleHiiPackageListSize ="
+        "\n  sizeof (mHiiPackageListData);\n"
+        );
       free (HiiPackageListBuffer);
       //
       // Done successfully

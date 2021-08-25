@@ -1983,6 +1983,10 @@ def CreateHeaderCode(Info, AutoGenC, AutoGenH):
     AutoGenH.Append('\nextern GUID  gEdkiiDscPlatformGuid;')
     AutoGenH.Append('\nextern CHAR8 *gEfiCallerBaseName;\n\n')
 
+    # FIXME: Different header? UEFI_HII conditional?
+    AutoGenH.Append('\nextern CONST VOID  *gModuleHiiPackageList;')
+    AutoGenH.Append('\nextern CONST UINTN gModuleHiiPackageListSize;\n\n')
+
     if Info.IsLibrary:
         return
 
