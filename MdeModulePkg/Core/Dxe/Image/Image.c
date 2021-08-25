@@ -1404,6 +1404,8 @@ CoreLoadImageCommon (
   // Install HII Package List Protocol onto the image handle
   //
   if (Image->ImageContext.HiiResourceData != 0) {
+    // FIXME: For testing - no image must use the old section
+    ASSERT (FALSE);
     Status = CoreInstallProtocolInterface (
                &Image->Handle,
                &gEfiHiiPackageListProtocolGuid,

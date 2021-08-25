@@ -553,7 +553,6 @@ ProcessManFile(
   CHAR16            *CmdFilePathName;
   EFI_DEVICE_PATH_PROTOCOL      *FileDevPath;
   EFI_DEVICE_PATH_PROTOCOL      *DevPath;
-  EFI_HII_PACKAGE_LIST_HEADER   *PackageListHeader;
 
   if ( ManFileName == NULL
     || Command     == NULL
@@ -570,7 +569,6 @@ ProcessManFile(
   CmdFileName       = NULL;
   CmdFilePathName   = NULL;
   CmdFileImgHandle  = NULL;
-  PackageListHeader = NULL;
   FileDevPath       = NULL;
   DevPath           = NULL;
 
@@ -657,41 +655,8 @@ ProcessManFile(
       *HelpText = NULL;
       goto Done;
     }
-    Status = gBS->OpenProtocol(
-                    CmdFileImgHandle,
-                    &gEfiHiiPackageListProtocolGuid,
-                    (VOID**)&PackageListHeader,
-                    gImageHandle,
-                    NULL,
-                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                    );
-    if(EFI_ERROR(Status)) {
-      *HelpText = NULL;
-      goto Done;
-    }
-
-    //
-    // If get package list on image handle, install it on HiiDatabase.
-    //
-    Status = gBS->InstallProtocolInterface (
-                    &mShellManDriverHandle,
-                    &gEfiDevicePathProtocolGuid,
-                    EFI_NATIVE_INTERFACE,
-                    &mShellManHiiDevicePath
-                    );
-    if (EFI_ERROR(Status)) {
-      goto Done;
-    }
-
-    Status = gHiiDatabase->NewPackageList (
-                            gHiiDatabase,
-                            PackageListHeader,
-                            mShellManDriverHandle,
-                            &mShellManHiiHandle
-                            );
-    if (EFI_ERROR (Status)) {
-      goto Done;
-    }
+    
+    // FIXME: New HII interaction for Shell commands?
 
     StringIdWalker = 1;
     do {

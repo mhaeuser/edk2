@@ -608,32 +608,16 @@ VlanConfigMain (
 {
   LIST_ENTRY    *List;
   CONST CHAR16  *Str;
-  EFI_HII_PACKAGE_LIST_HEADER     *PackageList;
   EFI_STATUS    Status;
 
   mImageHandle = ImageHandle;
-
-  //
-  // Retrieve HII package list from ImageHandle
-  //
-  Status = gBS->OpenProtocol (
-                  ImageHandle,
-                  &gEfiHiiPackageListProtocolGuid,
-                  (VOID **) &PackageList,
-                  ImageHandle,
-                  NULL,
-                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
 
   //
   // Publish HII package list to HII Database.
   //
   Status = gHiiDatabase->NewPackageList (
                           gHiiDatabase,
-                          PackageList,
+                          gModuleHiiPackageList,
                           NULL,
                           &mHiiHandle
                           );
