@@ -1848,6 +1848,7 @@ DxeImageVerificationHandler (
     //
     // Image Hash is not found in both forbidden and allowed database.
     //
+    Action = EFI_IMAGE_EXECUTION_AUTH_SIG_NOT_FOUND;
     DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is not signed and %s hash of image is not found in DB/DBX.\n", mHashTypeStr));
     goto Failed;
   }
