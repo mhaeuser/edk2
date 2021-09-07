@@ -1828,23 +1828,23 @@ DxeImageVerificationHandler (
   }
 
   //
-  // Start Image Validation.
+  // This image is not signed. The SHA256 hash value of the image must match a record in the security database "db".
   //
-  if (SecDataDir == NULL || SecDataDir->Size == 0) {
-    DbStatus = IsSignatureFoundInDatabase (
-                 EFI_IMAGE_SECURITY_DATABASE,
-                 mImageDigest,
-                 &mCertType,
-                 mImageDigestSize,
-                 &IsFound
-                 );
-    if (!EFI_ERROR (DbStatus) && IsFound) {
-      //
-      // Image Hash is in allowed database (DB).
-      //
-      return EFI_SUCCESS;
-    }
+  DbStatus = IsSignatureFoundInDatabase (
+                EFI_IMAGE_SECURITY_DATABASE,
+                mImageDigest,
+                &mCertType,
+                mImageDigestSize,
+                &IsFound
+                );
+  if (!EFI_ERROR (DbStatus) && IsFound) {
+    //
+    // Image Hash is in allowed database (DB).
+    //
+    return EFI_SUCCESS;
+  }
 
+  if (SecDataDir == NULL || SecDataDir->Size == 0) {
     //
     // Image Hash is not found in both forbidden and allowed database.
     //
@@ -1926,24 +1926,6 @@ DxeImageVerificationHandler (
     if (!IsVerified) {
       if (IsAllowedByDb (AuthData, AuthDataSize)) {
         IsVerified = TRUE;
-      }
-    }
-
-    //
-    // Check the image's hash value.
-    //
-    if (!IsVerified) {
-      DbStatus = IsSignatureFoundInDatabase (
-                   EFI_IMAGE_SECURITY_DATABASE,
-                   mImageDigest,
-                   &mCertType,
-                   mImageDigestSize,
-                   &IsFound
-                   );
-      if (!EFI_ERROR (DbStatus) && IsFound) {
-        IsVerified = TRUE;
-      } else {
-        DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is signed but signature is not allowed by DB and %s hash of image is not found in DB/DBX.\n", mHashTypeStr));
       }
     }
   }
