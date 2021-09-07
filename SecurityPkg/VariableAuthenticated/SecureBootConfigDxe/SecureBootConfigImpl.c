@@ -1740,14 +1740,20 @@ HashPeImage (
   EFI_IMAGE_SECTION_HEADER  *SectionHeader;
   UINTN                     Index;
   UINTN                     Pos;
+  //
+  // For now, all images are enrolled by only SHA-256 hashes. This may change in
+  // the future (based on e.g. the database format), and SHA-256 assumptions
+  // below need to be removed in the process.
+  //
+  // This constraint must be kept in-sync with the verification routine in
+  // DxeImageVerificationLib. Please note that as of UEFI 2.9, the "dbx"
+  // database may only contain SHA-256 image hashes.
+  //
+  ASSERT (HashAlg == HASHALG_SHA256);
 
   HashCtx       = NULL;
   SectionHeader = NULL;
   Status        = FALSE;
-
-  if (HashAlg != HASHALG_SHA256) {
-    return FALSE;
-  }
 
   //
   // Initialize context of hash.
@@ -1954,65 +1960,6 @@ Done:
 }
 
 /**
-  Recognize the Hash algorithm in PE/COFF Authenticode and calculate hash of
-  Pe/Coff image based on the authenticated image hashing in PE/COFF Specification
-  8.0 Appendix A
-
-  @retval EFI_UNSUPPORTED             Hash algorithm is not supported.
-  @retval EFI_SUCCESS                 Hash successfully.
-
-**/
-EFI_STATUS
-HashPeImageByType (
-  VOID
-  )
-{
-  UINT8                     Index;
-  WIN_CERTIFICATE_EFI_PKCS  *PkcsCertData;
-
-  PkcsCertData = (WIN_CERTIFICATE_EFI_PKCS *) (mImageBase + mSecDataDir->Offset);
-
-  for (Index = 0; Index < HASHALG_MAX; Index++) {
-    //
-    // Check the Hash algorithm in PE/COFF Authenticode.
-    //    According to PKCS#7 Definition:
-    //        SignedData ::= SEQUENCE {
-    //            version Version,
-    //            digestAlgorithms DigestAlgorithmIdentifiers,
-    //            contentInfo ContentInfo,
-    //            .... }
-    //    The DigestAlgorithmIdentifiers can be used to determine the hash algorithm in PE/COFF hashing
-    //    This field has the fixed offset (+32) in final Authenticode ASN.1 data.
-    //    Fixed offset (+32) is calculated based on two bytes of length encoding.
-     //
-    if ((*(PkcsCertData->CertData + 1) & TWO_BYTE_ENCODE) != TWO_BYTE_ENCODE) {
-      //
-      // Only support two bytes of Long Form of Length Encoding.
-      //
-      continue;
-    }
-
-    //
-    if (CompareMem (PkcsCertData->CertData + 32, mHash[Index].OidValue, mHash[Index].OidLength) == 0) {
-      break;
-    }
-  }
-
-  if (Index == HASHALG_MAX) {
-    return EFI_UNSUPPORTED;
-  }
-
-  //
-  // HASH PE Image based on Hash algorithm in PE/COFF Authenticode.
-  //
-  if (!HashPeImage(Index)) {
-    return EFI_UNSUPPORTED;
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
   Enroll a new signature of executable into Signature Database.
 
   @param[in] PrivateData     The module's private data.
@@ -2177,40 +2124,9 @@ EnrollImageSignatureToSigDB (
     goto ON_EXIT;
   }
 
-  if (mSecDataDir->SizeOfCert == 0) {
-    if (!HashPeImage (HASHALG_SHA256)) {
-      Status =  EFI_SECURITY_VIOLATION;
-      goto ON_EXIT;
-    }
-  } else {
-
-    //
-    // Read the certificate data
-    //
-    mCertificate = (WIN_CERTIFICATE *)(mImageBase + mSecDataDir->Offset);
-
-    if (mCertificate->wCertificateType == WIN_CERT_TYPE_EFI_GUID) {
-      GuidCertData = (WIN_CERTIFICATE_UEFI_GUID*) mCertificate;
-      if (CompareMem (&GuidCertData->CertType, &gEfiCertTypeRsa2048Sha256Guid, sizeof(EFI_GUID)) != 0) {
-        Status = EFI_ABORTED;
-        goto ON_EXIT;
-      }
-
-      if (!HashPeImage (HASHALG_SHA256)) {
-        Status = EFI_ABORTED;
-        goto ON_EXIT;;
-      }
-
-    } else if (mCertificate->wCertificateType == WIN_CERT_TYPE_PKCS_SIGNED_DATA) {
-
-      Status = HashPeImageByType ();
-      if (EFI_ERROR (Status)) {
-        goto ON_EXIT;;
-      }
-    } else {
-      Status = EFI_ABORTED;
-      goto ON_EXIT;
-    }
+  if (!HashPeImage (HASHALG_SHA256)) {
+    Status =  EFI_SECURITY_VIOLATION;
+    goto ON_EXIT;
   }
 
   //
