@@ -406,7 +406,7 @@ AllocatePool (
 
   Status = PeiServicesAllocatePool (AllocationSize, &Buffer);
   if (EFI_ERROR (Status)) {
-    Buffer = NULL;
+    return NULL;
   }
 
   return Buffer;
