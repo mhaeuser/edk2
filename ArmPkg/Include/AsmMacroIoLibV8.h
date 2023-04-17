@@ -34,14 +34,28 @@
         cbnz   SAFE_XREG, 1f        ;\
         b      .                    ;// We should never get here
 
-#define _ASM_FUNC(Name, Section)    \
-  .global   Name                  ; \
-  .section  #Section, "ax"        ; \
-  .type     Name, %function       ; \
+#define _ASM_FUNC_HDR(Name, Section) \
+  .global   Name                   ; \
+  .section  #Section, "ax"         ; \
+  .type     Name, %function
+
+#define _ASM_FUNC_FTR(Name)         \
   Name:                           ; \
   AARCH64_BTI(c)
 
+#define _ASM_FUNC(Name, Section)    \
+  _ASM_FUNC_HDR(Name, Section)    ; \
+  _ASM_FUNC_FTR(Name)
+
+#define _ASM_FUNC_ALIGN(Name, Section, Align)       \
+  _ASM_FUNC_HDR(Name, Section)                    ; \
+  .balign Align                                   ; \
+  _ASM_FUNC_FTR(Name)
+
 #define ASM_FUNC(Name)  _ASM_FUNC(ASM_PFX(Name), .text. ## Name)
+
+#define ASM_FUNC_ALIGN(Name, Align)  \
+  _ASM_FUNC_ALIGN(ASM_PFX(Name), .text. ## Name, Align)
 
 #define MOV32(Reg, Val)                   \
   movz      Reg, (Val) >> 16, lsl #16   ; \
